@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:librio/src/data/datasources/auth_service.dart';
-import 'package:librio/src/data/repositories/user_repository_impl.dart';
-import 'package:librio/src/domain/usecases/sign_up_usecase.dart';
-import 'package:librio/src/presentation/auth/screens/signup/sign_up_viewmodel.dart';
+import 'package:librio/src/data/data.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/presentation/presentation.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);

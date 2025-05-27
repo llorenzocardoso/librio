@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:librio/src/domain/usecases/add_book_usecase.dart';
+import 'package:go_router/go_router.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/routes/routes.dart';
 
 class AddBookViewModel extends ChangeNotifier {
   final AddBookUseCase _useCase;
@@ -32,5 +34,9 @@ class AddBookViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void navigateToHome(BuildContext context) {
+    context.go(AppRoutes.home);
   }
 }

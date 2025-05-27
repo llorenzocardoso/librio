@@ -39,9 +39,8 @@ class BookRepositoryImpl implements BookRepository {
     final query = await _firestore
         .collection('books')
         .where('ownerId', isEqualTo: ownerId)
-        .orderBy('createdAt', descending: true)
         .get();
-    return query.docs.map((doc) {
+    final books = query.docs.map((doc) {
       final data = doc.data();
       return Book(
         id: doc.id,
@@ -55,5 +54,48 @@ class BookRepositoryImpl implements BookRepository {
         available: data['available'] as bool? ?? true,
       );
     }).toList();
+
+    // Ordenar no lado do cliente (mais recentes primeiro)
+    books.sort((a, b) => b.id.compareTo(a.id));
+    return books;
+  }
+
+  @override
+  Future<List<Book>> getAllBooks({String? excludeUserId}) async {
+    final query = await _firestore
+        .collection('books')
+        .where('available', isEqualTo: true)
+        .get();
+    final books = query.docs.map((doc) {
+      final data = doc.data();
+      return Book(
+        id: doc.id,
+        title: data['title'] as String,
+        author: data['author'] as String,
+        imageUrl: data['imageUrl'] as String? ?? '',
+        condition: data['condition'] as String,
+        ownerId: data['ownerId'] as String,
+        genre: data['genre'] as String,
+        description: data['description'] as String? ?? '',
+        available: data['available'] as bool? ?? true,
+      );
+    }).toList();
+
+    // Filtrar livros do usuário especificado (se fornecido)
+    if (excludeUserId != null) {
+      books.removeWhere((book) => book.ownerId == excludeUserId);
+    }
+
+    // Ordenar no lado do cliente por enquanto (mais recentes primeiro)
+    books.sort((a, b) => b.id.compareTo(a.id));
+    return books;
+  }
+
+  @override
+  Future<void> updateBookAvailability(String bookId, bool available) async {
+    await _firestore.collection('books').doc(bookId).update({
+      'available': available,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 }

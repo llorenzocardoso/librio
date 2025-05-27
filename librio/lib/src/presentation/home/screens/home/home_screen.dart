@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:librio/src/presentation/presentation.dart';
-import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,20 +9,28 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   late HomeViewModel viewmodel;
   int selectedCategoryIndex = 0;
-  int _selectedBottomIndex = 0;
 
   @override
   void initState() {
     super.initState();
     viewmodel = HomeViewModel();
     viewmodel.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      viewmodel.refresh();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     viewmodel.dispose();
     super.dispose();
   }
@@ -32,80 +39,160 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final isLoading = viewmodel.isLoading;
     final books = viewmodel.books;
+    final error = viewmodel.error;
     final categories = books.map((b) => b.genre).toSet().toList()..sort();
+
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (error != null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: Colors.red),
+              const SizedBox(height: 16),
+              const Text(
+                'Erro ao carregar livros',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                error,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => viewmodel.refresh(),
+                child: const Text('Tentar novamente'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: viewmodel.refresh,
-              child: CustomScrollView(
-                slivers: [
-                  // Custom App Bar
-                  SliverToBoxAdapter(
-                    child: SafeArea(
-                      bottom: false,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Librio',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+      body: RefreshIndicator(
+        onRefresh: viewmodel.refresh,
+        child: CustomScrollView(
+          slivers: [
+            // Custom App Bar
+            SliverToBoxAdapter(
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Librio',
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
                             ),
-                            IconButton(
-                              icon: SvgPicture.asset(
-                                  'assets/icons/notification_icon.svg',
-                                  width: 32,
-                                  height: 32),
-                              onPressed: () {
-                                // Implement notification functionality
-                              },
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: SvgPicture.asset(
+                            'assets/icons/notification_icon.svg',
+                            width: 32,
+                            height: 32),
+                        onPressed: () {
+                          // Implement notification functionality
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Campo de busca customizado
+            const SliverToBoxAdapter(
+              child: SearchBarWidget(),
+            ),
+
+            // Notificação de avaliações pendentes
+            const SliverToBoxAdapter(
+              child: PendingRatingsNotification(),
+            ),
+            // Filtro de categorias
+            SliverToBoxAdapter(
+              child: CategoryFilter(
+                categories: categories,
+                selectedIndex: selectedCategoryIndex,
+                onSelected: (idx) =>
+                    setState(() => selectedCategoryIndex = idx),
+              ),
+            ),
+
+            // Título da seção
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(
+                  'Livros Disponíveis para Troca',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+
+            // Grid de livros
+            books.isEmpty
+                ? SliverFillRemaining(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.book_outlined,
+                              size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Nenhum livro disponível',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
                             ),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Seja o primeiro a adicionar um livro!',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () =>
+                                viewmodel.navigateToAddBook(context),
+                            icon: const Icon(Icons.add),
+                            label: const Text('Adicionar livro'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF1D4ED8),
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  // Campo de busca customizado
-                  const SliverToBoxAdapter(
-                    child: SearchBarWidget(),
-                  ),
-                  // Filtro de categorias
-                  SliverToBoxAdapter(
-                    child: CategoryFilter(
-                      categories: categories,
-                      selectedIndex: selectedCategoryIndex,
-                      onSelected: (idx) =>
-                          setState(() => selectedCategoryIndex = idx),
-                    ),
-                  ),
-
-                  // Título da seção
-                  const SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-                      child: Text(
-                        'Livros Disponíveis para Troca',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // Grid de livros
-                  SliverPadding(
+                  )
+                : SliverPadding(
                     padding: const EdgeInsets.all(16),
                     sliver: SliverGrid(
                       gridDelegate:
@@ -120,16 +207,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           final book = books[index];
                           return BookCard(
                             book: book,
-                            onTap: () => context.push('/details', extra: book),
+                            onTap: () =>
+                                viewmodel.navigateToBookDetails(context, book),
                           );
                         },
                         childCount: books.length,
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => viewmodel.navigateToAddBook(context),
         backgroundColor: Colors.white,
@@ -139,58 +227,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: SvgPicture.asset('assets/icons/add_icon.svg',
             width: 24, height: 24),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedBottomIndex,
-        items: [
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: SvgPicture.asset('assets/icons/home_icon.svg',
-                  width: 24, height: 24),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: SvgPicture.asset('assets/icons/exchange_icon.svg',
-                  width: 24, height: 24),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: SvgPicture.asset('assets/icons/chat_icon.svg',
-                  width: 24, height: 24),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: SvgPicture.asset('assets/icons/profile_icon.svg',
-                  width: 24, height: 24),
-            ),
-            label: '',
-          ),
-        ],
-        onTap: (index) {
-          setState(() => _selectedBottomIndex = index);
-          switch (index) {
-            case 0:
-              context.go('/');
-              break;
-            case 3:
-              context.push('/profile');
-              break;
-            // Add other cases if needed for other tabs
-            default:
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 0),
     );
   }
 }

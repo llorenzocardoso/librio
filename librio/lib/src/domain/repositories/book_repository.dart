@@ -10,4 +10,8 @@ abstract class BookRepository {
   });
 
   Future<List<Book>> getUserBooks(String ownerId);
+
+  Future<List<Book>> getAllBooks({String? excludeUserId});
+
+  Future<void> updateBookAvailability(String bookId, bool available);
 }

@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart'; // Usaremos para navegação
-import 'package:librio/src/data/datasources/auth_service.dart';
-import 'package:librio/src/data/repositories/user_repository_impl.dart';
-import 'package:librio/src/domain/usecases/login_usecase.dart';
-import 'package:librio/src/presentation/auth/screens/login/login_viewmodel.dart';
+import 'package:librio/src/data/data.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/presentation/presentation.dart';
 
-// Se você tiver uma rota definida para SignUpScreen, importe-a ou defina o nome da rota
-// Exemplo: import 'signup_screen.dart';
-// Ou defina o nome da rota como string: final String signUpRouteName = '/signup';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -47,26 +42,16 @@ class LoginScreenState extends State<LoginScreen> {
 
   void _onLogin() {
     if (_formKey.currentState!.validate()) {
-      viewModel
-          .login(
-        _emailController.text,
-        _passwordController.text,
-      )
-          .then((_) {
-        if (viewModel.user != null) {
-          context.go('/');
-        }
-      });
+      viewModel.login(
+        _emailController.text.trim(), // Remove espaços em branco
+        _passwordController.text.trim(), // Remove espaços em branco
+        context,
+      );
     }
   }
 
   void _navigateToSignUp() {
-    // Navegar para a tela de SignUp
-    // Se estiver usando go_router e tiver uma rota nomeada:
-    context.push(
-        '/signup'); // Certifique-se de que '/signup' está definido em suas rotas
-    // Ou, se estiver navegando para um widget diretamente (menos comum com go_router para rotas principais):
-    // context.push(MaterialPageRoute(builder: (context) => SignUpScreen()));
+    viewModel.navigateToSignup(context);
   }
 
   void _navigateToForgotPassword() {
@@ -117,19 +102,23 @@ class LoginScreenState extends State<LoginScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                              color: Color(0xFF1D4ED8), width: 2),
+                            color: Color(0xFF1D4ED8),
+                            width: 2,
+                          ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18, horizontal: 16),
+                          vertical: 18,
+                          horizontal: 16,
+                        ),
                       ),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira seu email';
                         }
-                        if (!RegExp(
-                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                            .hasMatch(value)) {
+                        // Regex mais flexível e padrão para validação de email
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value.trim())) {
                           return 'Por favor, insira um email válido';
                         }
                         return null;
@@ -151,20 +140,20 @@ class LoginScreenState extends State<LoginScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: const BorderSide(
-                              color: Color(0xFF1D4ED8), width: 2),
+                            color: Color(0xFF1D4ED8),
+                            width: 2,
+                          ),
                         ),
                         contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18, horizontal: 16),
+                          vertical: 18,
+                          horizontal: 16,
+                        ),
                       ),
                       obscureText: true,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
                         }
-                        // Você pode adicionar validação de tamanho mínimo se desejar
-                        // if (value.length < 6) {
-                        //   return 'A senha deve ter pelo menos 6 caracteres';
-                        // }
                         return null;
                       },
                     ),
@@ -230,16 +219,20 @@ class LoginScreenState extends State<LoginScreen> {
                 child: const Text(
                   'Cadastre-se',
                   style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500),
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
               const Center(
                 child: Text(
                   'Ou continue com',
-                  style: TextStyle(color: Colors.black54, fontSize: 16),
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 16,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -251,9 +244,10 @@ class LoginScreenState extends State<LoginScreen> {
                     child: const Text(
                       'G',
                       style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
                     onPressed: () {
                       // TODO: Implementar login com Google
@@ -272,8 +266,11 @@ class LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(width: 20),
                   _SocialButton(
-                    child: Icon(Icons.apple,
-                        size: 28, color: Colors.grey.shade800),
+                    child: Icon(
+                      Icons.apple,
+                      size: 28,
+                      color: Colors.grey.shade800,
+                    ),
                     onPressed: () {
                       // TODO: Implementar login com Apple
                     },

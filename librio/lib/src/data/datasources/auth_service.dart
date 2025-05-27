@@ -8,12 +8,9 @@ class AuthService {
 
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
-    try {
+    // Não encapsular em Exception para preservar FirebaseAuthException
       return await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-    } catch (e) {
-      throw Exception(e);
-    }
   }
 
   Future<void> signOut() async {
@@ -22,11 +19,8 @@ class AuthService {
 
   Future<fb.UserCredential> signUpWithEmailAndPassword(
       String email, String password) async {
-    try {
+    // Não encapsular em Exception para preservar FirebaseAuthException
       return await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
-    } catch (e) {
-      throw Exception(e);
-    }
   }
 }

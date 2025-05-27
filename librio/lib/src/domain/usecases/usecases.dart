@@ -1,3 +1,14 @@
 export 'add_book_usecase.dart';
 export 'get_user_books_usecase.dart';
 export 'sign_up_usecase.dart';
+export 'login_usecase.dart';
+export 'get_user_exchanges_usecase.dart';
+export 'get_all_books_usecase.dart';
+export 'create_exchange_usecase.dart';
+export 'create_rating_usecase.dart';
+export 'get_user_profile_usecase.dart';
+export 'get_user_ratings_usecase.dart';
+export 'check_rating_exists_usecase.dart';
+export 'update_book_availability_usecase.dart';
+export 'confirm_exchange_completion_usecase.dart';
+export 'get_pending_ratings_usecase.dart';

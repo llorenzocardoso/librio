@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
-import 'package:librio/src/presentation/home/widgets/book_card.dart';
-import 'package:librio/src/presentation/home/screens/profile/profile_viewmodel.dart';
-import 'package:librio/src/data/datasources/auth_service.dart';
-import 'package:librio/src/domain/usecases/get_user_books_usecase.dart';
-import 'package:librio/src/data/repositories/book_repository_impl.dart';
+import 'package:librio/src/data/data.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/presentation/presentation.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -14,7 +12,8 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with WidgetsBindingObserver {
   late ProfileViewModel viewModel;
   final AuthService _authService = AuthService();
 
@@ -26,10 +25,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     viewModel.addListener(() => setState(() {}));
     viewModel.fetchUserBooks();
+    viewModel.fetchUserProfile();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Recarregar dados quando o app voltar ao foco
+      viewModel.fetchUserBooks();
+      viewModel.fetchUserProfile();
+    }
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     viewModel.dispose();
     super.dispose();
   }
@@ -46,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               title: const Text('Sair'),
               onTap: () async {
                 await _authService.signOut();
-                context.go('/login');
+                viewModel.navigateToLogin(context);
               },
             ),
           ],
@@ -69,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         foregroundColor: Colors.black,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => viewModel.navigateBack(context),
         ),
         actions: [
           IconButton(
@@ -88,6 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 CircleAvatar(
                   radius: 60,
@@ -105,16 +117,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 20),
-                    SizedBox(width: 4),
-                    Text('5.0'),
-                    SizedBox(width: 8),
-                    Text('12 trocas'),
-                  ],
-                ),
+                viewModel.isLoadingProfile
+                    ? const CircularProgressIndicator()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 20),
+                          const SizedBox(width: 4),
+                          Text(
+                              viewModel.userProfile?.averageRating.toStringAsFixed(1) ?? "0.0"),
+                          const SizedBox(width: 8),
+                          Text(
+                              '${viewModel.userProfile?.exchangeCount ?? 0} trocas'),
+                        ],
+                      ),
                 const SizedBox(height: 16),
                 const Align(
                   alignment: Alignment.centerLeft,
@@ -125,26 +141,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
-                  height: 200,
+                  height: 150,
                   child: viewModel.isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: userBooks.length,
-                          itemBuilder: (context, index) {
-                            final book = userBooks[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: BookCard(
-                                book: book,
-                                onTap: () =>
-                                    context.push('/details', extra: book),
+                      : viewModel.error != null
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.error_outline,
+                                      size: 48, color: Colors.red),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Erro: ${viewModel.error}',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ElevatedButton(
+                                    onPressed: () => viewModel.fetchUserBooks(),
+                                    child: const Text('Tentar novamente'),
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
+                            )
+                          : userBooks.isEmpty
+                              ? const Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.book_outlined,
+                                          size: 48, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Nenhum livro cadastrado',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Adicione seus primeiros livros!',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: userBooks.length,
+                                  itemBuilder: (context, index) {
+                                    final book = userBooks[index];
+                                    return Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 8.0),
+                                      child: BookCard(
+                                        book: book,
+                                        onTap: () =>
+                                            viewModel.navigateToBookDetails(
+                                                context, book),
+                                      ),
+                                    );
+                                  },
+                                ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -152,12 +218,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 const Text(
                   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                   style: TextStyle(color: Colors.black54),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -165,27 +231,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(height: 8),
-                const Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 16),
-                    SizedBox(width: 4),
-                    Text('5.0', style: TextStyle(fontWeight: FontWeight.bold)),
-                    SizedBox(width: 8),
-                    Text('Lorenzo Cardoso'),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                  style: TextStyle(color: Colors.black54),
-                ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 6),
+                viewModel.isLoadingProfile
+                    ? const CircularProgressIndicator()
+                    : viewModel.ratings.isEmpty
+                        ? const Text(
+                            'Nenhuma avaliação ainda',
+                            style: TextStyle(color: Colors.black54),
+                          )
+                        : Column(
+                            children: viewModel.ratings.take(2).map((rating) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Row(
+                                          children: List.generate(5, (index) {
+                                            return Icon(
+                                              Icons.star,
+                                              color: index < rating.stars
+                                                  ? Colors.amber
+                                                  : Colors.grey[300],
+                                              size: 16,
+                                            );
+                                          }),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          DateFormat('dd/MM/yyyy')
+                                              .format(rating.createdAt),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    if (rating.message.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        rating.message,
+                                        style: const TextStyle(
+                                            color: Colors.black54),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
-                    onPressed: () => context.push('/edit_profile'),
+                    onPressed: () => viewModel.navigateToEditProfile(context),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1D4ED8),
                       shape: RoundedRectangleBorder(
@@ -202,6 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavigationBar(currentIndex: 3),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:librio/src/domain/usecases/sign_up_usecase.dart';
-import 'package:librio/src/domain/entities/user.dart';
+import 'package:librio/src/domain/domain.dart';
 
 class SignUpViewModel extends ChangeNotifier {
   final SignUpUseCase _useCase;

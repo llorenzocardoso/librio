@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:librio/src/domain/usecases/add_book_usecase.dart';
-import 'package:librio/src/data/repositories/book_repository_impl.dart';
-import 'package:librio/src/presentation/home/screens/add_book/add_book_viewmodel.dart';
+import 'package:librio/src/data/data.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/presentation/presentation.dart';
 
 class AddBookScreen extends StatefulWidget {
   const AddBookScreen({Key? key}) : super(key: key);
@@ -272,7 +271,11 @@ class _AddBookScreenState extends State<AddBookScreen> {
       if (viewModel.error == null) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Livro cadastrado com sucesso')));
-        context.pop();
+        // Navegar de volta para a home e forçar atualização
+        viewModel.navigateToHome(context);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Erro: ${viewModel.error}')));
       }
     }).catchError((e) {
       ScaffoldMessenger.of(context)
