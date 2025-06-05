@@ -46,19 +46,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
     }
   }
 
-  Widget _buildConditionStars(String condition) {
-    final stars = _getConditionStars(condition);
-    return Row(
-      children: List.generate(5, (index) {
-        return Icon(
-          Icons.star,
-          size: 16,
-          color: index < stars ? Colors.orange : Colors.grey[300],
-        );
-      }),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final book = viewModel.book!;
@@ -86,7 +73,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               // Book cover image
               Center(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(24),
                   child: SizedBox(
                     width: double.infinity,
                     height: 260,
@@ -103,38 +90,51 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
               // Title and basic info
               Text(
                 book.title,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text(book.author,
-                      style: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.bold)),
+                  Text(
+                    book.author,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   const Spacer(),
-                  Text(book.genre,
-                      style: TextStyle(
-                          color: Colors.grey[700],
-                          fontWeight: FontWeight.bold)),
+                  Text(
+                    book.genre,
+                    style: TextStyle(
+                      color: Colors.grey[700],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
               // Informações do livro
               Row(
                 children: [
-                  const Icon(Icons.star, color: Colors.yellow, size: 16),
+                  const Icon(Icons.star, color: Colors.amber, size: 16),
                   const SizedBox(width: 4),
                   Text(
                     '${_getConditionStars(book.condition)} (${book.condition})',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               // Owner info
               viewModel.isLoadingOwner
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
                   : Row(
                       children: [
                         CircleAvatar(
@@ -144,8 +144,8 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                                   viewModel.ownerProfile!.photoUrl!.isNotEmpty
                               ? NetworkImage(viewModel.ownerProfile!.photoUrl!)
                               : const AssetImage(
-                                      'assets/images/avatar_placeholder.png')
-                                  as ImageProvider,
+                                  'assets/images/avatar_placeholder.png',
+                                ) as ImageProvider,
                         ),
                         const SizedBox(width: 8),
                         Column(
@@ -154,16 +154,23 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                             Text(
                               viewModel.ownerProfile?.name ?? 'Usuário',
                               style: const TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Row(
                               children: [
-                                const Icon(Icons.star,
-                                    color: Colors.yellow, size: 16),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 4),
-                                Text(viewModel.ownerProfile?.averageRating
-                                        .toStringAsFixed(1) ??
-                                    "0.0"),
+                                Text(
+                                  viewModel.ownerProfile?.averageRating
+                                          .toStringAsFixed(1) ??
+                                      "0.0",
+                                ),
                               ],
                             ),
                           ],
@@ -183,19 +190,31 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           },
                           child: const Row(
                             children: [
-                              Text('Ver perfil',
-                                  style: TextStyle(color: Colors.blue)),
+                              Text(
+                                'Ver perfil',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                ),
+                              ),
                               SizedBox(width: 4),
-                              Icon(Icons.arrow_forward_ios,
-                                  color: Colors.blue, size: 14),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: Colors.blue,
+                                size: 14,
+                              ),
                             ],
                           ),
                         ),
                       ],
                     ),
               const SizedBox(height: 16),
-              const Text('Descrição',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text(
+                'Descrição',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 8),
               const Text(
                 'Informações detalhadas sobre o livro serão exibidas aqui.',
@@ -223,9 +242,10 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 child: const Text(
                   'Propor troca',
                   style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:go_router/go_router.dart';
+import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/routes/routes.dart';
-import 'package:librio/src/data/repositories/rating_repository_impl.dart';
 
 class BookDetailsViewModel extends ChangeNotifier {
   final GetUserProfileUseCase _getUserProfileUseCase;

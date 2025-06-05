@@ -20,8 +20,10 @@ mixin ProfileViewModel on ChangeNotifier {
     context.push(AppRoutes.bookDetails, extra: book);
   }
 
-  void navigateToEditProfile(BuildContext context) {
-    context.push(AppRoutes.editProfile);
+  void navigateToEditProfile(BuildContext context) async {
+    await context.push(AppRoutes.editProfile);
+    // Recarregar perfil quando voltar da tela de edição
+    fetchUserProfile();
   }
 
   void navigateBack(BuildContext context) {

@@ -68,6 +68,10 @@ class AppRouter {
           return ExchangeDetailsScreen(exchange: exchange);
         },
       ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
     ],
   );
 }

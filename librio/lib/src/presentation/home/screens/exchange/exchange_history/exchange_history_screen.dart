@@ -29,31 +29,42 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
   }
 
   Widget _buildExchangeCard(Exchange exchange) {
+    final bool isCompleted = exchange.status == ExchangeStatus.completed;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Colors.grey.shade300, width: 2),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.shade100,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header com status e data
+          // Header com status
           Row(
             children: [
+              Text(
+                DateFormat('dd/MM/yyyy').format(exchange.createdAt),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: viewModel.getStatusColor(exchange.status),
+                  color: _getStatusColor(exchange.status),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -61,32 +72,11 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              const Spacer(),
-              Text(
-                DateFormat('dd/MM/yyyy').format(exchange.createdAt),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
             ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Informação da troca
-          Text(
-            exchange.proposerId == viewModel.getCurrentUserId()
-                ? 'Você propôs uma troca para ${exchange.receiverName}'
-                : '${exchange.proposerName} propôs uma troca para você',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
           ),
 
           const SizedBox(height: 16),
@@ -94,44 +84,33 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
           // Livros da troca
           Row(
             children: [
-              // Livro oferecido
+              // Livro oferecido (esquerda)
               Expanded(
                 child: Column(
                   children: [
                     Container(
-                      height: 100,
+                      height: 85,
+                      width: 60,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(7),
+                        borderRadius: BorderRadius.circular(5),
                         child: exchange.proposerBookImageUrl.isNotEmpty
                             ? Image.network(
                                 exchange.proposerBookImageUrl,
                                 fit: BoxFit.cover,
-                                width: double.infinity,
                               )
                             : Container(
                                 color: Colors.grey[300],
                                 child: const Icon(
                                   Icons.book,
-                                  size: 30,
+                                  size: 25,
                                   color: Colors.grey,
                                 ),
                               ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      exchange.proposerBookTitle,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -139,52 +118,41 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
 
               // Seta
               const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Icon(
                   Icons.arrow_forward,
-                  size: 20,
+                  size: 18,
                   color: Colors.grey,
                 ),
               ),
 
-              // Livro desejado
+              // Livro desejado (direita)
               Expanded(
                 child: Column(
                   children: [
                     Container(
-                      height: 100,
+                      height: 85,
+                      width: 60,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
                         border: Border.all(color: Colors.grey.shade300),
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(7),
+                        borderRadius: BorderRadius.circular(5),
                         child: exchange.receiverBookImageUrl.isNotEmpty
                             ? Image.network(
                                 exchange.receiverBookImageUrl,
                                 fit: BoxFit.cover,
-                                width: double.infinity,
                               )
                             : Container(
                                 color: Colors.grey[300],
                                 child: const Icon(
                                   Icons.book,
-                                  size: 30,
+                                  size: 25,
                                   color: Colors.grey,
                                 ),
                               ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      exchange.receiverBookTitle,
-                      style: const TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -192,39 +160,74 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
             ],
           ),
 
-          // Mensagem se houver
-          if (exchange.message != null && exchange.message!.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 16),
+
+          // Avatares dos usuários e status de verificação
+          Column(
+            children: [
+              // Linha com avatares e sistema de conexão
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Text(
-                    'Mensagem:',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                  // Avatar do usuário da esquerda
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[300],
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      size: 20,
                       color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    exchange.message!,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black87,
+
+                  const SizedBox(width: 16),
+
+                  // Sistema de linhas e ícone central (sem texto)
+                  Expanded(
+                    child: _buildConnectionSystem(exchange),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Avatar do usuário da direita
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[300],
+                      border: Border.all(color: Colors.grey.shade400, width: 1),
+                    ),
+                    child: const Icon(
+                      Icons.person,
+                      size: 20,
+                      color: Colors.grey,
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+
+              // Texto "Troca Verificada" separado
+              if (isCompleted &&
+                  exchange.proposerConfirmed &&
+                  exchange.receiverConfirmed) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Troca Verificada',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
+          ),
 
           // Botão de avaliação para trocas concluídas não avaliadas
           if (viewModel.canUserRate(exchange)) ...[
@@ -233,46 +236,20 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () => viewModel.navigateToRating(context, exchange),
-                icon: const Icon(Icons.star, size: 18),
-                label: const Text('Avaliar usuário'),
+                icon: const Icon(Icons.star, size: 16),
+                label: const Text(
+                  'Avaliar usuário',
+                  style: TextStyle(fontSize: 12),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.amber,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  minimumSize: const Size(0, 32),
                 ),
-              ),
-            ),
-          ],
-
-          // Indicador de avaliação já feita
-          if (exchange.status == ExchangeStatus.completed &&
-              viewModel.hasUserRated(exchange.id)) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.green[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green[200]!),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.green[600], size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Você já avaliou esta troca',
-                      style: TextStyle(
-                        color: Colors.green[600],
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],
@@ -281,18 +258,91 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
     );
   }
 
+  Widget _buildConnectionSystem(Exchange exchange) {
+    final bool isCurrentUserProposer =
+        exchange.proposerId == viewModel.getCurrentUserId();
+    final bool leftUserConfirmed = isCurrentUserProposer
+        ? exchange.proposerConfirmed
+        : exchange.receiverConfirmed;
+    final bool rightUserConfirmed = isCurrentUserProposer
+        ? exchange.receiverConfirmed
+        : exchange.proposerConfirmed;
+    final bool bothConfirmed =
+        exchange.proposerConfirmed && exchange.receiverConfirmed;
+    final bool isCompleted = exchange.status == ExchangeStatus.completed;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Linha esquerda conectando ao ícone
+        Expanded(
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              color: leftUserConfirmed
+                  ? const Color(0xFFC3F15A)
+                  : Colors.grey[300],
+              borderRadius: BorderRadius.circular(1.5),
+            ),
+          ),
+        ),
+
+        // Ícone central (sem espaçamento para conectar diretamente)
+        SvgPicture.asset(
+          'assets/icons/checkbox_verification.svg',
+          width: 28,
+          height: 28,
+          colorFilter: ColorFilter.mode(
+            bothConfirmed && isCompleted
+                ? const Color(0xFFC3F15A)
+                : Colors.grey[400]!,
+            BlendMode.srcIn,
+          ),
+        ),
+
+        // Linha direita conectando ao ícone
+        Expanded(
+          child: Container(
+            height: 3,
+            decoration: BoxDecoration(
+              color: rightUserConfirmed
+                  ? const Color(0xFFC3F15A)
+                  : Colors.grey[300],
+              borderRadius: BorderRadius.circular(1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Color _getStatusColor(ExchangeStatus status) {
+    switch (status) {
+      case ExchangeStatus.pending:
+        return Colors.orange;
+      case ExchangeStatus.accepted:
+        return Colors.blue;
+      case ExchangeStatus.completed:
+        return Colors.green;
+      case ExchangeStatus.rejected:
+        return Colors.red;
+      case ExchangeStatus.cancelled:
+        return Colors.grey;
+    }
+  }
+
   String _getStatusText(ExchangeStatus status) {
     switch (status) {
       case ExchangeStatus.pending:
-        return 'Pendente';
+        return 'Troca pendente';
       case ExchangeStatus.accepted:
-        return 'Aceita';
+        return 'Troca aceita';
       case ExchangeStatus.completed:
-        return 'Concluída';
+        return 'Troca concluída';
       case ExchangeStatus.rejected:
-        return 'Recusada';
+        return 'Troca recusada';
       case ExchangeStatus.cancelled:
-        return 'Cancelada';
+        return 'Troca cancelada';
     }
   }
 

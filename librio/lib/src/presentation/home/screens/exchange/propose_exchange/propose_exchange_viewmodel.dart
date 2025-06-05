@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
 
-
 class ProposeExchangeViewModel extends ChangeNotifier {
   late CreateExchangeUseCase _createExchangeUseCase;
   late GetUserBooksUseCase _getUserBooksUseCase;

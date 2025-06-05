@@ -24,7 +24,6 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
     viewModel = ExchangeDetailsViewModel();
     viewModel.addListener(() => setState(() {}));
 
-    // Verificar se o usuário já avaliou esta troca (apenas para trocas concluídas)
     if (widget.exchange.status == ExchangeStatus.completed) {
       viewModel.checkIfUserHasRated(widget.exchange.id);
     }

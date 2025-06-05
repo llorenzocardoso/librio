@@ -124,8 +124,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                         children: [
                           const Icon(Icons.star, color: Colors.amber, size: 20),
                           const SizedBox(width: 4),
-                          Text(
-                              viewModel.userProfile?.averageRating.toStringAsFixed(1) ?? "0.0"),
+                          Text(viewModel.userProfile?.averageRating
+                                  .toStringAsFixed(1) ??
+                              "0.0"),
                           const SizedBox(width: 8),
                           Text(
                               '${viewModel.userProfile?.exchangeCount ?? 0} trocas'),
@@ -219,10 +220,20 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-                  style: TextStyle(color: Colors.black54),
-                ),
+                viewModel.isLoadingProfile
+                    ? const CircularProgressIndicator()
+                    : Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          viewModel.userProfile?.description?.isNotEmpty ==
+                              true
+                              ? viewModel.userProfile!.description!
+                              : 'Nenhuma descrição adicionada ainda.',
+                          style: const TextStyle(
+                            color: Colors.black54,
+                          ),
+                        ),
+                    ),
                 const SizedBox(height: 12),
                 const Align(
                   alignment: Alignment.centerLeft,

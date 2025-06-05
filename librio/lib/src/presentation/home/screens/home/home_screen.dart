@@ -158,8 +158,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.book_outlined,
-                              size: 64, color: Colors.grey),
+                          const Icon(
+                            Icons.book_outlined,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(height: 16),
                           const Text(
                             'Nenhum livro disponível',
@@ -207,8 +210,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           final book = books[index];
                           return BookCard(
                             book: book,
-                            onTap: () =>
-                                viewmodel.navigateToBookDetails(context, book),
+                            onTap: () => viewmodel.navigateToBookDetails(
+                              context,
+                              book,
+                            ),
                           );
                         },
                         childCount: books.length,

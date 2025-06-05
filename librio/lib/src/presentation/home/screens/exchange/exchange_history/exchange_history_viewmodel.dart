@@ -72,21 +72,6 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
     return fb.FirebaseAuth.instance.currentUser?.uid;
   }
 
-  Color getStatusColor(ExchangeStatus status) {
-    switch (status) {
-      case ExchangeStatus.pending:
-        return Colors.orange;
-      case ExchangeStatus.accepted:
-        return Colors.blue;
-      case ExchangeStatus.completed:
-        return Colors.green;
-      case ExchangeStatus.rejected:
-        return Colors.red;
-      case ExchangeStatus.cancelled:
-        return Colors.grey;
-    }
-  }
-
   bool hasUserRated(String exchangeId) {
     return _ratingStatus[exchangeId] ?? false;
   }

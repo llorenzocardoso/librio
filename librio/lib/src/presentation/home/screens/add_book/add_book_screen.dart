@@ -157,7 +157,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
                   underline: const SizedBox(),
                   onChanged: (val) => setState(() => selectedGenre = val),
                   items: genres
-                      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                      .map(
+                        (g) => DropdownMenuItem(
+                          value: g,
+                          child: Text(g),
+                        ),
+                      )
                       .toList(),
                 ),
               ),
@@ -205,7 +210,7 @@ class _AddBookScreenState extends State<AddBookScreen> {
                       IconButton(
                         icon: Icon(
                           Icons.star,
-                          color: isSelected ? Colors.yellow : Colors.grey[400],
+                          color: isSelected ? Colors.amber : Colors.grey[400],
                         ),
                         onPressed: () => setState(() => conditionIndex = idx),
                       ),
@@ -256,7 +261,12 @@ class _AddBookScreenState extends State<AddBookScreen> {
         authorController.text.trim().isEmpty ||
         selectedGenre == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Por favor, preencha todos os campos')));
+        const SnackBar(
+          content: Text(
+            'Por favor, preencha todos os campos',
+          ),
+        ),
+      );
       return;
     }
     viewModel
@@ -270,16 +280,31 @@ class _AddBookScreenState extends State<AddBookScreen> {
         .then((_) {
       if (viewModel.error == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Livro cadastrado com sucesso')));
+          const SnackBar(
+            content: Text(
+              'Livro cadastrado com sucesso',
+            ),
+          ),
+        );
         // Navegar de volta para a home e forçar atualização
         viewModel.navigateToHome(context);
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Erro: ${viewModel.error}')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Erro: ${viewModel.error}',
+            ),
+          ),
+        );
       }
     }).catchError((e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.toString(),
+          ),
+        ),
+      );
     });
   }
 }
