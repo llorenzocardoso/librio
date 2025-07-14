@@ -9,4 +9,13 @@ abstract class UserProfileRepository {
     String? description,
     String? photoUrl,
   });
+
+  Future<void> updateUserLocation({
+    required String userId,
+    required double latitude,
+    required double longitude,
+    String? city,
+    String? state,
+    String? address,
+  });
 }

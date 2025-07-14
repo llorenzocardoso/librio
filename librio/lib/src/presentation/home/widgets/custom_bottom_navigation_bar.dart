@@ -61,7 +61,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
             if (currentIndex != 1) context.push(AppRoutes.exchangeRequests);
             break;
           case 2:
-            // Chat - implementar depois
+            if (currentIndex != 2) context.push(AppRoutes.chatList);
             break;
           case 3:
             if (currentIndex != 3) context.push(AppRoutes.profile);

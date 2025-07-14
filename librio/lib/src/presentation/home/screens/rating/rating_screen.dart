@@ -26,6 +26,9 @@ class _RatingScreenState extends State<RatingScreen> {
       CreateRatingUseCase(RatingRepositoryImpl()),
     );
     viewModel.addListener(() => setState(() {}));
+
+    // Carregar informações do usuário que está sendo avaliado
+    viewModel.loadUserProfile(evaluatedUserId);
   }
 
   @override
@@ -96,17 +99,82 @@ class _RatingScreenState extends State<RatingScreen> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const CircleAvatar(
-                        radius: 20,
-                        backgroundImage:
-                            AssetImage('assets/images/avatar_placeholder.png'),
-                      ),
+                      viewModel.isLoadingUserProfile
+                          ? const CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.grey,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.white),
+                              ),
+                            )
+                          : CircleAvatar(
+                              radius: 20,
+                              backgroundColor:
+                                  viewModel.evaluatedUserProfile?.photoUrl !=
+                                          null
+                                      ? null
+                                      : Colors.grey,
+                              backgroundImage: viewModel
+                                          .evaluatedUserProfile?.photoUrl !=
+                                      null
+                                  ? NetworkImage(
+                                      viewModel.evaluatedUserProfile!.photoUrl!)
+                                  : null,
+                              child: viewModel.evaluatedUserProfile?.photoUrl !=
+                                      null
+                                  ? null
+                                  : const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 24,
+                                    ),
+                            ),
                       const SizedBox(width: 12),
-                      Text(
-                        evaluatedUserName,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              viewModel.evaluatedUserProfile?.name ??
+                                  evaluatedUserName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (viewModel.evaluatedUserProfile != null) ...[
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    viewModel
+                                        .evaluatedUserProfile!.averageRating
+                                        .toStringAsFixed(1),
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '(${viewModel.evaluatedUserProfile!.ratingCount} avaliações)',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ],

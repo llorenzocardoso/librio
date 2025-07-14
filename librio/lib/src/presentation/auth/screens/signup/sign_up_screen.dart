@@ -26,6 +26,10 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   late SignUpViewModel viewModel;
 
+  // Estados para controlar visibilidade das senhas
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   @override
   void initState() {
     super.initState();
@@ -103,8 +107,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
                         ),
                       ),
                       validator: (value) {
@@ -114,7 +119,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                         return null;
                       },
                     ),
-
+                    const SizedBox(height: 24),
                     // Email
                     TextFormField(
                       focusNode: _emailFocusNode,
@@ -129,8 +134,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -157,11 +163,25 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
@@ -187,11 +207,26 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
                         ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, confirme sua senha';
@@ -256,11 +291,17 @@ class SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _SocialButton(
-                    child: const Text('G', style: TextStyle(fontSize: 24)),
+                    child: const Text(
+                      'G',
+                      style: TextStyle(fontSize: 24),
+                    ),
                     onPressed: () {},
                   ),
                   _SocialButton(
-                    child: const Icon(Icons.facebook, size: 24),
+                    child: const Icon(
+                      Icons.facebook,
+                      size: 24,
+                    ),
                     onPressed: () {},
                   ),
                   _SocialButton(

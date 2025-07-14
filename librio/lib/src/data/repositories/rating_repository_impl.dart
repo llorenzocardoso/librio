@@ -54,13 +54,21 @@ class RatingRepositoryImpl implements RatingRepository {
 
   @override
   Future<UserProfile> getUserProfile(String userId) async {
-    final doc = await _firestore.collection('users').doc(userId).get();
+    // Primeiro tentar buscar na coleção user_profiles (nova estrutura)
+    final userProfileDoc = await _firestore.collection('user_profiles').doc(userId).get();
 
-    if (!doc.exists) {
+    if (userProfileDoc.exists) {
+      return UserProfileModel.fromFirestore(userProfileDoc);
+    }
+
+    // Fallback para coleção users (compatibilidade)
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+
+    if (!userDoc.exists) {
       throw Exception('Usuário não encontrado');
     }
 
-    return UserProfileModel.fromFirestore(doc);
+    return UserProfileModel.fromFirestore(userDoc);
   }
 
   @override

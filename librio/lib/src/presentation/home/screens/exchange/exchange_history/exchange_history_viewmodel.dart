@@ -8,17 +8,25 @@ import 'package:librio/src/presentation/presentation.dart';
 class ExchangeHistoryViewModel extends ChangeNotifier {
   late GetUserExchangesUseCase _getUserExchangesUseCase;
   late CheckRatingExistsUseCase _checkRatingExistsUseCase;
+  late GetUserProfileUseCase _getUserProfileUseCase;
 
   List<Exchange> exchanges = [];
   bool isLoading = true;
   String? error;
-  Map<String, bool> _ratingStatus = {}; // exchangeId -> hasRated
+  final Map<String, bool> _ratingStatus = {}; // exchangeId -> hasRated
+  final Map<String, UserProfile> _userProfiles = {}; // userId -> UserProfile
 
   ExchangeHistoryViewModel() {
     _getUserExchangesUseCase =
         GetUserExchangesUseCase(ExchangeRepositoryImpl());
     _checkRatingExistsUseCase =
         CheckRatingExistsUseCase(RatingRepositoryImpl());
+    _getUserProfileUseCase = GetUserProfileUseCase(RatingRepositoryImpl());
+  }
+
+  // Buscar perfil do usuário (com cache)
+  UserProfile? getUserProfile(String userId) {
+    return _userProfiles[userId];
   }
 
   Future<void> loadExchanges() async {
@@ -28,6 +36,9 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
     try {
       final userExchanges = await _getUserExchangesUseCase.execute(user.uid);
       exchanges = userExchanges;
+
+      // Buscar perfis dos usuários envolvidos nas trocas
+      await _loadUserProfiles();
 
       // Verificar status de avaliação para trocas concluídas
       await _checkRatingStatusForCompletedExchanges(user.uid);
@@ -39,6 +50,28 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> _loadUserProfiles() async {
+    final userIds = <String>{};
+
+    // Coletar todos os IDs únicos de usuários
+    for (final exchange in exchanges) {
+      userIds.add(exchange.proposerId);
+      userIds.add(exchange.receiverId);
+    }
+
+    // Buscar perfis em paralelo
+    final futures = userIds.map((userId) async {
+      try {
+        final profile = await _getUserProfileUseCase.execute(userId);
+        _userProfiles[userId] = profile;
+      } catch (e) {
+        throw Exception('Erro ao buscar perfil do usuário $userId: $e');
+      }
+    });
+
+    await Future.wait(futures);
   }
 
   Future<void> _checkRatingStatusForCompletedExchanges(String userId) async {

@@ -3,36 +3,36 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/shared/shared.dart';
+import '../../chat/chat_helper.dart';
 
 class ProposeExchangeViewModel extends ChangeNotifier {
   late CreateExchangeUseCase _createExchangeUseCase;
-  late GetUserBooksUseCase _getUserBooksUseCase;
+  final BookDataManager _bookDataManager = BookDataManager();
 
-  List<Book> userBooks = [];
+  List<Book> get userBooks => _bookDataManager.userBooks;
   Book? selectedBook;
   bool isLoading = false;
-  bool isLoadingBooks = true;
+  bool get isLoadingBooks => _bookDataManager.isLoading;
   String? error;
 
   ProposeExchangeViewModel() {
     _createExchangeUseCase = CreateExchangeUseCase(ExchangeRepositoryImpl());
-    _getUserBooksUseCase = GetUserBooksUseCase(BookRepositoryImpl());
+    _bookDataManager.addListener(_onBooksDataChanged);
+  }
+
+  void _onBooksDataChanged() {
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _bookDataManager.removeListener(_onBooksDataChanged);
+    super.dispose();
   }
 
   Future<void> loadUserBooks() async {
-    final user = fb.FirebaseAuth.instance.currentUser;
-    if (user == null) return;
-
-    try {
-      final books = await _getUserBooksUseCase.execute(user.uid);
-      userBooks = books;
-      isLoadingBooks = false;
-      notifyListeners();
-    } catch (e) {
-      error = e.toString();
-      isLoadingBooks = false;
-      notifyListeners();
-    }
+    await _bookDataManager.loadUserBooks();
   }
 
   void selectBook(Book book) {
@@ -64,6 +64,26 @@ class ProposeExchangeViewModel extends ChangeNotifier {
       );
 
       _showSnackBar(context, 'Proposta enviada com sucesso!');
+
+      // Iniciar chat automaticamente após proposta enviada
+      final currentUser = fb.FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        // Dar um pequeno delay para o snackbar aparecer
+        await Future.delayed(const Duration(seconds: 1));
+
+        // Oferecer para iniciar conversa
+        final shouldStartChat = await _showChatDialog(context);
+        if (shouldStartChat) {
+          await ChatHelper.startChatWith(
+            context,
+            receiverId,
+            currentUser.uid,
+            forceStart: true, // Forçar início pois acabou de enviar proposta
+          );
+          return; // Não navegar de volta ainda
+        }
+      }
+
       navigateBack(context);
     } catch (e) {
       error = e.toString();
@@ -82,5 +102,33 @@ class ProposeExchangeViewModel extends ChangeNotifier {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
+  }
+
+  Future<bool> _showChatDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Iniciar Conversa'),
+            content: const Text(
+                'Sua proposta foi enviada com sucesso! Gostaria de conversar com o dono do livro?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Agora não'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF176FF1),
+                ),
+                child: const Text(
+                  'Conversar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 }

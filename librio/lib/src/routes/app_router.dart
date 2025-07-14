@@ -13,7 +13,8 @@ class AppRouter {
     redirect: (context, state) {
       final loggedIn = fb.FirebaseAuth.instance.currentUser != null;
       final goingToLogin = state.uri.toString() == AppRoutes.login ||
-          state.uri.toString() == AppRoutes.signup;
+          state.uri.toString() == AppRoutes.signup ||
+          state.uri.toString().startsWith(AppRoutes.resetPassword);
       if (!loggedIn && !goingToLogin) return AppRoutes.login;
       if (loggedIn && goingToLogin) return AppRoutes.home;
       return null;
@@ -26,6 +27,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.signup,
         builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.resetPassword,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
       GoRoute(
         path: AppRoutes.home,
@@ -41,6 +46,13 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.addBook,
         builder: (context, state) => const AddBookScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.editBook,
+        builder: (context, state) {
+          final book = state.extra as Book;
+          return EditBookScreen(book: book);
+        },
       ),
       GoRoute(
         path: AppRoutes.profile,
@@ -71,6 +83,33 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.editProfile,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.chatList,
+        builder: (context, state) => const ChatListScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.chat}/:chatId',
+        builder: (context, state) {
+          final chatId = state.pathParameters['chatId']!;
+          final otherUserName = state.uri.queryParameters['otherUserName'];
+          return ChatScreen(
+            chatId: chatId,
+            otherUserName: otherUserName,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.settings,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.locationSettings,
+        builder: (context, state) => const LocationSettingsScreen(),
       ),
     ],
   );

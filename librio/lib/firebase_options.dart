@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyClnuvyXaxLKjJ2JUmsgr5zN9gkTfIAnVQ',
-    appId: '1:180000134955:android:1857aad21d2eb86e7ed76e',
-    messagingSenderId: '180000134955',
-    projectId: 'librio-bf422',
-    storageBucket: 'librio-bf422.firebasestorage.app',
+    apiKey: 'AIzaSyDnY5PZ1CIRIRxEJHNY1iVvllpBQlWbjdg',
+    appId: '1:398106514550:android:359b85e2a113b31a923b57',
+    messagingSenderId: '398106514550',
+    projectId: 'librio-12fd4',
+    storageBucket: 'librio-12fd4.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDrglKDIhd3DPrEIdMKdUBvIS8yOlS9JYQ',
-    appId: '1:180000134955:ios:175424e75c25e7ad7ed76e',
-    messagingSenderId: '180000134955',
-    projectId: 'librio-bf422',
-    storageBucket: 'librio-bf422.firebasestorage.app',
+    apiKey: 'AIzaSyA1uF5XxlUmSoc7YRlFvSR1KKw9pMWl7As',
+    appId: '1:398106514550:ios:16732dc07b1fe41d923b57',
+    messagingSenderId: '398106514550',
+    projectId: 'librio-12fd4',
+    storageBucket: 'librio-12fd4.firebasestorage.app',
     iosBundleId: 'com.lorenzocardoso.librio',
   );
+
 }

@@ -20,8 +20,11 @@ class Exchange {
   final String? message; // Mensagem opcional da proposta
   final bool proposerConfirmed; // Se o proposer confirmou a conclusão
   final bool receiverConfirmed; // Se o receiver confirmou a conclusão
+  final DateTime? proposerConfirmedAt; // Quando o proposer confirmou
+  final DateTime? receiverConfirmedAt; // Quando o receiver confirmou
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final DateTime? completedAt; // Quando a troca foi concluída
 
   Exchange({
     required this.id,
@@ -45,8 +48,11 @@ class Exchange {
     this.message,
     this.proposerConfirmed = false,
     this.receiverConfirmed = false,
+    this.proposerConfirmedAt,
+    this.receiverConfirmedAt,
     required this.createdAt,
     this.updatedAt,
+    this.completedAt,
   });
 }
 

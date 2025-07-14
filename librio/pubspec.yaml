@@ -39,6 +39,11 @@ dependencies:
   firebase_core: ^2.27.0
   cloud_firestore: ^4.15.8
   firebase_auth: ^4.17.8
+  firebase_storage: ^11.6.9
+
+  # Image Picker
+  image_picker: ^1.0.7
+  path: ^1.8.3
 
   # Routing
   go_router: ^13.2.0
@@ -51,6 +56,13 @@ dependencies:
 
   # Date formatting
   intl: ^0.19.0
+
+  # Geolocation
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+
+  # Shared Preferences
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

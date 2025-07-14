@@ -3,7 +3,6 @@ import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/presentation/presentation.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -20,6 +19,9 @@ class LoginScreenState extends State<LoginScreen> {
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
   late LoginViewModel viewModel;
+
+  // Estado para controlar visibilidade da senha
+  bool _obscurePassword = true;
 
   @override
   void initState() {
@@ -55,9 +57,7 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void _navigateToForgotPassword() {
-    // TODO: Implementar navegação para a tela de "Esqueceu a senha"
-    // context.push('/forgot-password');
-    print('Navegar para esqueci minha senha');
+    viewModel.navigateToResetPassword(context);
   }
 
   @override
@@ -148,8 +148,21 @@ class LoginScreenState extends State<LoginScreen> {
                           vertical: 18,
                           horizontal: 16,
                         ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
@@ -226,94 +239,9 @@ class LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              const Center(
-                child: Text(
-                  'Ou continue com',
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center, // Centralizar os botões sociais
-                children: [
-                  _SocialButton(
-                    child: const Text(
-                      'G',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    onPressed: () {
-                      // TODO: Implementar login com Google
-                    },
-                  ),
-                  const SizedBox(width: 20),
-                  _SocialButton(
-                    child: const Icon(
-                      Icons.facebook,
-                      size: 28,
-                      color: Color(0xFF0866FF),
-                    ),
-                    onPressed: () {
-                      // TODO: Implementar login com Facebook
-                    },
-                  ),
-                  const SizedBox(width: 20),
-                  _SocialButton(
-                    child: Icon(
-                      Icons.apple,
-                      size: 28,
-                      color: Colors.grey.shade800,
-                    ),
-                    onPressed: () {
-                      // TODO: Implementar login com Apple
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32), // Espaço no final
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Widget _SocialButton (pode ser mantido como está ou ajustado)
-class _SocialButton extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-  const _SocialButton({required this.child, required this.onPressed, Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 56, // Pode ajustar o tamanho se necessário
-        height: 56,
-        decoration: BoxDecoration(
-          color: Colors.white, // Fundo branco como na imagem
-          borderRadius: BorderRadius.circular(12), // Bordas mais arredondadas
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08), // Sombra mais sutil
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            )
-          ],
-          // border: Border.all(color: Colors.grey.shade300) // Opcional: borda sutil
-        ),
-        alignment: Alignment.center,
-        child: child,
       ),
     );
   }

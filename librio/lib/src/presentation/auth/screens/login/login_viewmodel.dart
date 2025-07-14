@@ -63,4 +63,8 @@ class LoginViewModel extends ChangeNotifier {
   void navigateToSignup(BuildContext context) {
     context.push(AppRoutes.signup);
   }
+
+  void navigateToResetPassword(BuildContext context) {
+    context.push(AppRoutes.resetPassword);
+  }
 }

@@ -30,6 +30,8 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
 
   Widget _buildExchangeCard(Exchange exchange) {
     final bool isCompleted = exchange.status == ExchangeStatus.completed;
+    final bool isCurrentUserProposer =
+        exchange.proposerId == viewModel.getCurrentUserId();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -170,19 +172,11 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Avatar do usuário da esquerda
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[300],
-                      border: Border.all(color: Colors.grey.shade400, width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 20,
-                      color: Colors.grey,
-                    ),
+                  _buildUserAvatar(
+                    isCurrentUserProposer
+                        ? exchange.proposerId
+                        : exchange.receiverId,
+                    32,
                   ),
 
                   const SizedBox(width: 16),
@@ -195,19 +189,11 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   const SizedBox(width: 16),
 
                   // Avatar do usuário da direita
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[300],
-                      border: Border.all(color: Colors.grey.shade400, width: 1),
-                    ),
-                    child: const Icon(
-                      Icons.person,
-                      size: 20,
-                      color: Colors.grey,
-                    ),
+                  _buildUserAvatar(
+                    isCurrentUserProposer
+                        ? exchange.receiverId
+                        : exchange.proposerId,
+                    32,
                   ),
                 ],
               ),
@@ -344,6 +330,34 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
       case ExchangeStatus.cancelled:
         return 'Troca cancelada';
     }
+  }
+
+  Widget _buildUserAvatar(String userId, double size) {
+    final userProfile = viewModel.getUserProfile(userId);
+
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.grey.shade400, width: 1),
+      ),
+      child: CircleAvatar(
+        radius: size / 2,
+        backgroundColor:
+            userProfile?.photoUrl != null ? null : Colors.grey[300],
+        backgroundImage: userProfile?.photoUrl != null
+            ? NetworkImage(userProfile!.photoUrl!)
+            : null,
+        child: userProfile?.photoUrl != null
+            ? null
+            : Icon(
+                Icons.person,
+                size: size * 0.6,
+                color: Colors.grey,
+              ),
+      ),
+    );
   }
 
   @override

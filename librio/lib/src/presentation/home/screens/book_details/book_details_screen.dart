@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/presentation/presentation.dart';
+import 'package:librio/src/domain/usecases/delete_book_usecase.dart';
+import 'package:librio/src/data/repositories/book_repository_impl.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   final Book book;
@@ -139,13 +143,24 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       children: [
                         CircleAvatar(
                           radius: 20,
+                          backgroundColor: viewModel.ownerProfile?.photoUrl !=
+                                      null &&
+                                  viewModel.ownerProfile!.photoUrl!.isNotEmpty
+                              ? null
+                              : Colors.grey,
                           backgroundImage: viewModel.ownerProfile?.photoUrl !=
                                       null &&
                                   viewModel.ownerProfile!.photoUrl!.isNotEmpty
                               ? NetworkImage(viewModel.ownerProfile!.photoUrl!)
-                              : const AssetImage(
-                                  'assets/images/avatar_placeholder.png',
-                                ) as ImageProvider,
+                              : null,
+                          child: viewModel.ownerProfile?.photoUrl != null &&
+                                  viewModel.ownerProfile!.photoUrl!.isNotEmpty
+                              ? null
+                              : const Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                         ),
                         const SizedBox(width: 8),
                         Column(
@@ -216,39 +231,235 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Informações detalhadas sobre o livro serão exibidas aqui.',
-                style: TextStyle(fontSize: 14),
+              Text(
+                book.description,
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: viewModel.isOwnBook
-          ? null // Não mostrar botão se for o próprio livro
+          ? _buildOwnBookButtons(context) // Mostrar botões de editar/excluir se for o próprio livro
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-              child: ElevatedButton(
-                onPressed: () {
-                  viewModel.navigateToProposeExchange(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(56),
-                  backgroundColor: const Color(0xFF176FF1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
+              child: viewModel.canChat
+                  ? Row(
+                      children: [
+                        // Botão de Chat
+                        Expanded(
+                          flex: 1,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              final currentUser =
+                                  FirebaseAuth.instance.currentUser;
+                              if (currentUser != null &&
+                                  viewModel.ownerProfile != null) {
+                                ChatHelper.startChatWith(
+                                  context,
+                                  viewModel.ownerProfile!.id,
+                                  currentUser.uid,
+                                  otherUserName: viewModel.ownerProfile!.name,
+                                );
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(56),
+                              side: const BorderSide(
+                                  color: Color(0xFF176FF1), width: 2),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.chat_bubble_outline,
+                              color: Color(0xFF176FF1),
+                              size: 20,
+                            ),
+                            label: const Text(
+                              'Conversar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF176FF1),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Botão de Propor Troca
+                        Expanded(
+                          flex: 1,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              viewModel.navigateToProposeExchange(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size.fromHeight(56),
+                              backgroundColor: const Color(0xFF176FF1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.swap_horiz,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            label: const Text(
+                              'Propor troca',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  :
+                  // Apenas botão de propor troca quando não pode conversar
+                  ElevatedButton.icon(
+                      onPressed: () {
+                        viewModel.navigateToProposeExchange(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(56),
+                        backgroundColor: const Color(0xFF176FF1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.swap_horiz,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'Propor troca',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+            ),
+    );
+  }
+
+  Widget _buildOwnBookButtons(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
+      child: Row(
+        children: [
+          // Botão de Editar
+          Expanded(
+            child: OutlinedButton.icon(
+                             onPressed: () {
+                 context.push('/edit_book', extra: widget.book);
+               },
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                side: const BorderSide(color: Color(0xFF176FF1), width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Text(
-                  'Propor troca',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+              ),
+              icon: const Icon(
+                Icons.edit,
+                color: Color(0xFF176FF1),
+                size: 20,
+              ),
+              label: const Text(
+                'Editar',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF176FF1),
                 ),
               ),
             ),
+          ),
+          const SizedBox(width: 12),
+          // Botão de Excluir
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _showDeleteConfirmation(context),
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(56),
+                side: const BorderSide(color: Colors.red, width: 2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              icon: const Icon(
+                Icons.delete,
+                color: Colors.red,
+                size: 20,
+              ),
+              label: const Text(
+                'Excluir',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Excluir livro'),
+        content: const Text(
+          'Tem certeza que deseja excluir este livro? Esta ação não pode ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // Fechar o dialog
+
+              try {
+                // Usar o DeleteBookUseCase para excluir
+                final deleteUseCase = DeleteBookUseCase(BookRepositoryImpl());
+                                 await deleteUseCase.execute(widget.book.id);
+
+                // Navegar de volta após sucesso
+                if (context.mounted) {
+                  context.pop();
+                }
+              } catch (e) {
+                // Mostrar erro se ocorrer
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao excluir livro: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -23,15 +23,27 @@ class UserRepositoryImpl implements UserRepository {
     await user.updateDisplayName(name);
     await user.reload();
     final fb.User updatedUser = fb.FirebaseAuth.instance.currentUser!;
-    final usersRef = FirebaseFirestore.instance.collection('users');
-    await usersRef.doc(updatedUser.uid).set({
+
+    final userData = {
       'name': name,
       'email': email,
       'description': '',
       'averageRating': 0,
       'ratingCount': 0,
+      'exchangeCount': 0,
       'photoUrl': updatedUser.photoURL ?? '',
-    });
+      'ratings': [],
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+
+    // Criar documento na coleção 'users' (compatibilidade)
+    final usersRef = FirebaseFirestore.instance.collection('users');
+    await usersRef.doc(updatedUser.uid).set(userData);
+
+    // Criar documento na coleção 'user_profiles' (nova estrutura)
+    final userProfilesRef = FirebaseFirestore.instance.collection('user_profiles');
+    await userProfilesRef.doc(updatedUser.uid).set(userData);
+
     return UserModel.fromFirebaseUser(updatedUser);
   }
 
@@ -46,4 +58,9 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> logout() => _authService.signOut();
+
+  @override
+  Future<void> resetPassword(String email) async {
+    await _authService.sendPasswordResetEmail(email: email);
+  }
 }

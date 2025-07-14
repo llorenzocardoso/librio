@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/routes/routes.dart';
+import '../chat/chat_helper.dart';
 
 class BookDetailsViewModel extends ChangeNotifier {
   final GetUserProfileUseCase _getUserProfileUseCase;
@@ -11,6 +12,8 @@ class BookDetailsViewModel extends ChangeNotifier {
   Book? _book;
   UserProfile? _ownerProfile;
   bool _isLoadingOwner = false;
+  bool _canChat = false;
+  bool _isCheckingChat = false;
   String? _error;
 
   BookDetailsViewModel({GetUserProfileUseCase? getUserProfileUseCase})
@@ -20,11 +23,14 @@ class BookDetailsViewModel extends ChangeNotifier {
   Book? get book => _book;
   UserProfile? get ownerProfile => _ownerProfile;
   bool get isLoadingOwner => _isLoadingOwner;
+  bool get canChat => _canChat;
+  bool get isCheckingChat => _isCheckingChat;
   String? get error => _error;
 
   void setBook(Book book) {
     _book = book;
     _loadOwnerProfile();
+    _checkCanChat();
     notifyListeners();
   }
 
@@ -58,5 +64,27 @@ class BookDetailsViewModel extends ChangeNotifier {
 
   void navigateBack(BuildContext context) {
     context.pop();
+  }
+
+  Future<void> _checkCanChat() async {
+    if (_book == null) return;
+
+    final currentUser = firebase_auth.FirebaseAuth.instance.currentUser;
+    if (currentUser == null || currentUser.uid == _book!.ownerId) {
+      _canChat = false;
+      return;
+    }
+
+    _isCheckingChat = true;
+    notifyListeners();
+
+    try {
+      _canChat = await ChatHelper.canChatWith(currentUser.uid, _book!.ownerId);
+    } catch (e) {
+      _canChat = false;
+    } finally {
+      _isCheckingChat = false;
+      notifyListeners();
+    }
   }
 }

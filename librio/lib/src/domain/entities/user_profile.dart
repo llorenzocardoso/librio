@@ -9,6 +9,13 @@ class UserProfile {
   final int exchangeCount; // Número total de trocas realizadas
   final List<String> ratings; // IDs das avaliações recebidas
 
+  // Campos de localização
+  final double? latitude;
+  final double? longitude;
+  final String? city;
+  final String? state;
+  final String? address;
+
   UserProfile({
     required this.id,
     required this.name,
@@ -19,5 +26,10 @@ class UserProfile {
     this.ratingCount = 0,
     this.exchangeCount = 0,
     this.ratings = const [],
+    this.latitude,
+    this.longitude,
+    this.city,
+    this.state,
+    this.address,
   });
 }

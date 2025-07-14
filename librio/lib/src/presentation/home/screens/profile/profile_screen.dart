@@ -15,7 +15,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with WidgetsBindingObserver {
   late ProfileViewModel viewModel;
-  final AuthService _authService = AuthService();
 
   @override
   void initState() {
@@ -46,22 +45,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   void _openSettings() {
-    showModalBottomSheet(
-      context: context,
-      builder: (_) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Sair'),
-              onTap: () async {
-                await _authService.signOut();
-                viewModel.navigateToLogin(context);
-              },
-            ),
-          ],
-        ),
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
       ),
     );
   }
@@ -101,20 +87,61 @@ class _ProfileScreenState extends State<ProfileScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircleAvatar(
-                  radius: 60,
-                  backgroundImage: user?.photoURL != null
-                      ? NetworkImage(user!.photoURL!)
-                      : null,
-                  child: user?.photoURL == null
-                      ? const Icon(Icons.person, size: 60)
-                      : null,
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 60,
+                      backgroundImage: viewModel.userProfile?.photoUrl != null
+                          ? NetworkImage(viewModel.userProfile!.photoUrl!)
+                          : user?.photoURL != null
+                              ? NetworkImage(user!.photoURL!)
+                              : null,
+                      child: (viewModel.userProfile?.photoUrl == null &&
+                              user?.photoURL == null)
+                          ? const Icon(Icons.person, size: 60)
+                          : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: viewModel.isUploadingPhoto
+                            ? null
+                            : () => viewModel.updateProfilePhoto(context),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: viewModel.isUploadingPhoto
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
                   user?.displayName ?? user?.email ?? '',
                   style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 viewModel.isLoadingProfile
@@ -124,12 +151,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                         children: [
                           const Icon(Icons.star, color: Colors.amber, size: 20),
                           const SizedBox(width: 4),
-                          Text(viewModel.userProfile?.averageRating
-                                  .toStringAsFixed(1) ??
-                              "0.0"),
+                          Text(
+                            viewModel.userProfile?.averageRating
+                                    .toStringAsFixed(1) ??
+                                '0.0',
+                          ),
                           const SizedBox(width: 8),
                           Text(
-                              '${viewModel.userProfile?.exchangeCount ?? 0} trocas'),
+                            '${viewModel.userProfile?.exchangeCount ?? 0} trocas',
+                          ),
                         ],
                       ),
                 const SizedBox(height: 16),
@@ -137,7 +167,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Livros disponíveis',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -150,8 +183,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.error_outline,
-                                      size: 48, color: Colors.red),
+                                  const Icon(
+                                    Icons.error_outline,
+                                    size: 48,
+                                    color: Colors.red,
+                                  ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Erro: ${viewModel.error}',
@@ -171,8 +207,11 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.book_outlined,
-                                          size: 48, color: Colors.grey),
+                                      Icon(
+                                        Icons.book_outlined,
+                                        size: 48,
+                                        color: Colors.grey,
+                                      ),
                                       SizedBox(height: 8),
                                       Text(
                                         'Nenhum livro cadastrado',
@@ -205,7 +244,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                                         book: book,
                                         onTap: () =>
                                             viewModel.navigateToBookDetails(
-                                                context, book),
+                                          context,
+                                          book,
+                                        ),
                                       ),
                                     );
                                   },
@@ -216,7 +257,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Sobre',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -225,33 +269,32 @@ class _ProfileScreenState extends State<ProfileScreen>
                     : Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          viewModel.userProfile?.description?.isNotEmpty ==
-                              true
+                          viewModel.userProfile?.description?.isNotEmpty == true
                               ? viewModel.userProfile!.description!
                               : 'Nenhuma descrição adicionada ainda.',
                           style: const TextStyle(
                             color: Colors.black54,
                           ),
                         ),
-                    ),
+                      ),
                 const SizedBox(height: 12),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Avaliações',
+                    'Comentários Recebidos',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 6),
                 viewModel.isLoadingProfile
                     ? const CircularProgressIndicator()
-                    : viewModel.ratings.isEmpty
+                    : viewModel.ratingsWithComments.isEmpty
                         ? const Text(
-                            'Nenhuma avaliação ainda',
+                            'Nenhum comentário ainda',
                             style: TextStyle(color: Colors.black54),
                           )
                         : Column(
-                            children: viewModel.ratings.take(2).map((rating) {
+                            children: viewModel.ratingsWithComments.take(2).map((rating) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Column(
@@ -295,22 +338,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                             }).toList(),
                           ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: () => viewModel.navigateToEditProfile(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1D4ED8),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text(
-                      'Editar perfil',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

@@ -24,6 +24,7 @@ class UserProfileViewModel extends ChangeNotifier {
 
   UserProfile? get userProfile => _userProfile;
   List<Rating> get ratings => _ratings;
+  List<Rating> get ratingsWithComments => _ratings.where((rating) => rating.message.trim().isNotEmpty).toList();
   bool get isLoading => _isLoading;
   String? get error => _error;
 

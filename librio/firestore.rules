@@ -3,21 +3,92 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Regras para a coleção de livros
     match /books/{bookId} {
-      // Permitir leitura e escrita para usuários autenticados (temporário para teste)
-      allow read, write: if request.auth != null;
+      // Permitir leitura para usuários autenticados
+      allow read: if request.auth != null;
+      // Permitir escrita apenas para o proprietário ou para operações de criação
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerId;
+      allow update: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      // Permitir deleção pelo proprietário ou para trocas concluídas (temporário)
+      allow delete: if request.auth != null;
     }
 
     // Regras para a coleção de trocas
     match /exchanges/{exchangeId} {
       // Permitir leitura e escrita para usuários autenticados envolvidos na troca
-      allow read, write: if request.auth != null;
+      allow read: if request.auth != null
+        && (request.auth.uid == resource.data.proposerId
+        || request.auth.uid == resource.data.receiverId);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.proposerId;
+      allow update: if request.auth != null
+        && (request.auth.uid == resource.data.proposerId
+        || request.auth.uid == resource.data.receiverId);
     }
 
-    // Regras para a coleção de usuários
+        // Regras para a coleção de usuários
     match /users/{userId} {
-      // Permitir leitura e escrita apenas para o próprio usuário
+      // Permitir leitura para usuários autenticados (necessário para buscar dados dos participantes do chat)
+      allow read: if request.auth != null;
+      // Permitir criação apenas para o próprio usuário
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Permitir atualização para o próprio usuário ou para estatísticas
+      allow update: if request.auth != null && (
+        request.auth.uid == userId ||
+        // Permitir atualização de estatísticas (rating e trocas)
+        ('averageRating' in request.resource.data && 'ratingCount' in request.resource.data) ||
+        ('exchangeCount' in request.resource.data)
+      );
+    }
+
+    // Regras para a coleção de perfis de usuários
+    match /user_profiles/{userId} {
+      // Permitir leitura para usuários autenticados (necessário para buscar dados dos participantes do chat)
+      allow read: if request.auth != null;
+      // Permitir criação apenas para o próprio usuário
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Permitir atualização para o próprio usuário ou para estatísticas
+      allow update: if request.auth != null && (
+        request.auth.uid == userId ||
+        // Permitir atualização de estatísticas (rating e trocas)
+        ('averageRating' in request.resource.data && 'ratingCount' in request.resource.data) ||
+        ('exchangeCount' in request.resource.data)
+      );
+    }
+
+    // Regras para a coleção de chats
+    match /chats/{chatId} {
+      // Permitir leitura e escrita apenas para participantes do chat
       allow read, write: if request.auth != null
-        && request.auth.uid == userId;
+        && request.auth.uid in resource.data.participantIds;
+      // Permitir criação de novos chats
+      allow create: if request.auth != null
+        && request.auth.uid in request.resource.data.participantIds;
+    }
+
+    // Regras para a coleção de mensagens
+    match /messages/{messageId} {
+      // Permitir leitura para usuários autenticados (será filtrado pela query)
+      allow read: if request.auth != null;
+      // Permitir escrita apenas para o autor da mensagem
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.senderId;
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.senderId;
+    }
+
+    // Regras para a coleção de estados de notificações
+    match /notification_states/{userId} {
+      // Permitir leitura e escrita apenas para o próprio usuário
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Regras para avaliacões/ratings
+    match /ratings/{ratingId} {
+      // Permitir leitura para usuários autenticados
+      allow read: if request.auth != null;
+      // Permitir criação apenas pelo avaliador
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.evaluatorId;
+      // Permitir atualização apenas pelo avaliador
+      allow update: if request.auth != null && request.auth.uid == resource.data.evaluatorId;
     }
   }
 }

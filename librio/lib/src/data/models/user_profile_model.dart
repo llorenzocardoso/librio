@@ -12,6 +12,11 @@ class UserProfileModel extends UserProfile {
     int ratingCount = 0,
     int exchangeCount = 0,
     List<String> ratings = const [],
+    double? latitude,
+    double? longitude,
+    String? city,
+    String? state,
+    String? address,
   }) : super(
           id: id,
           name: name,
@@ -22,6 +27,11 @@ class UserProfileModel extends UserProfile {
           ratingCount: ratingCount,
           exchangeCount: exchangeCount,
           ratings: ratings,
+          latitude: latitude,
+          longitude: longitude,
+          city: city,
+          state: state,
+          address: address,
         );
 
   factory UserProfileModel.fromFirestore(DocumentSnapshot doc) {
@@ -36,6 +46,11 @@ class UserProfileModel extends UserProfile {
       ratingCount: data['ratingCount'] ?? 0,
       exchangeCount: data['exchangeCount'] ?? 0,
       ratings: List<String>.from(data['ratings'] ?? []),
+      latitude: data['latitude']?.toDouble(),
+      longitude: data['longitude']?.toDouble(),
+      city: data['city'],
+      state: data['state'],
+      address: data['address'],
     );
   }
 
@@ -49,6 +64,11 @@ class UserProfileModel extends UserProfile {
       'ratingCount': ratingCount,
       'exchangeCount': exchangeCount,
       'ratings': ratings,
+      'latitude': latitude,
+      'longitude': longitude,
+      'city': city,
+      'state': state,
+      'address': address,
     };
   }
 }

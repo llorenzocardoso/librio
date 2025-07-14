@@ -94,7 +94,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -113,12 +116,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
-                          size: 64, color: Colors.red),
+                      const Icon(
+                        Icons.error_outline,
+                        size: 64,
+                        color: Colors.red,
+                      ),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         'Erro ao carregar perfil',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.red,
@@ -151,16 +157,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           children: [
                             CircleAvatar(
                               radius: 50,
-                              backgroundImage: viewModel
-                                              .userProfile?.photoUrl !=
-                                          null &&
+                              backgroundColor:
+                                  viewModel.userProfile?.photoUrl != null &&
+                                          viewModel
+                                              .userProfile!.photoUrl!.isNotEmpty
+                                      ? null
+                                      : Colors.grey,
+                              backgroundImage:
+                                  viewModel.userProfile?.photoUrl != null &&
+                                          viewModel
+                                              .userProfile!.photoUrl!.isNotEmpty
+                                      ? NetworkImage(
+                                          viewModel.userProfile!.photoUrl!)
+                                      : null,
+                              child: viewModel.userProfile?.photoUrl != null &&
                                       viewModel
                                           .userProfile!.photoUrl!.isNotEmpty
-                                  ? NetworkImage(
-                                      viewModel.userProfile!.photoUrl!)
-                                  : const AssetImage(
-                                          'assets/images/avatar_placeholder.png')
-                                      as ImageProvider,
+                                  ? null
+                                  : const Icon(
+                                      Icons.person,
+                                      color: Colors.white,
+                                      size: 50,
+                                    ),
                             ),
                             const SizedBox(height: 16),
                             Text(
@@ -174,8 +192,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.star,
-                                    color: Colors.amber, size: 20),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                  size: 20,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   viewModel.userProfile?.averageRating
@@ -231,14 +252,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              'Avaliações Recebidas',
+                              'Comentários Recebidos',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(height: 16),
-                            viewModel.ratings.isEmpty
+                            viewModel.ratingsWithComments.isEmpty
                                 ? Container(
                                     padding: const EdgeInsets.all(32),
                                     decoration: BoxDecoration(
@@ -255,7 +276,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                               color: Colors.grey[400]),
                                           const SizedBox(height: 16),
                                           Text(
-                                            'Nenhuma avaliação ainda',
+                                            'Nenhum comentário ainda',
                                             style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.grey[600],
@@ -264,7 +285,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
-                                            'As avaliações aparecerão aqui após as trocas',
+                                            'Comentários de avaliações aparecerão aqui após as trocas',
                                             style: TextStyle(
                                               fontSize: 14,
                                               color: Colors.grey[500],
@@ -276,7 +297,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                     ),
                                   )
                                 : Column(
-                                    children: viewModel.ratings
+                                    children: viewModel.ratingsWithComments
                                         .map((rating) =>
                                             _buildRatingCard(rating))
                                         .toList(),

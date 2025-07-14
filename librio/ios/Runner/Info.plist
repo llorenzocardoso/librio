@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- Permissões de localização -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>O Librio precisa da sua localização para encontrar livros disponíveis para troca próximos a você.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>O Librio precisa da sua localização para encontrar livros disponíveis para troca próximos a você.</string>
 </dict>
 </plist>
