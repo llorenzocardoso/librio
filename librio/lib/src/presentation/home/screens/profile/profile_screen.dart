@@ -31,7 +31,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // Recarregar dados quando o app voltar ao foco
       viewModel.fetchUserBooks();
       viewModel.fetchUserProfile();
     }

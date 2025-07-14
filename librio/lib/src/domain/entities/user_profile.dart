@@ -4,12 +4,11 @@ class UserProfile {
   final String email;
   final String? photoUrl;
   final String? description;
-  final double averageRating; // Média das avaliações
-  final int ratingCount; // Número total de avaliações
-  final int exchangeCount; // Número total de trocas realizadas
-  final List<String> ratings; // IDs das avaliações recebidas
+  final double averageRating;
+  final int ratingCount;
+  final int exchangeCount;
+  final List<String> ratings;
 
-  // Campos de localização
   final double? latitude;
   final double? longitude;
   final String? city;

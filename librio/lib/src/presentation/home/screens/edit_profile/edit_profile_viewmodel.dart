@@ -58,14 +58,12 @@ class EditProfileViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Atualizar perfil
       await _updateUserProfileUseCase.execute(
         userId: user.uid,
         name: name.isNotEmpty ? name : null,
         description: description.isNotEmpty ? description : null,
       );
 
-      // Mostrar sucesso
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Perfil atualizado com sucesso!'),
@@ -73,7 +71,6 @@ class EditProfileViewModel extends ChangeNotifier {
         ),
       );
 
-      // Voltar para a tela anterior
       navigateBack(context);
     } catch (e) {
       _error = e.toString();

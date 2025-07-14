@@ -2,12 +2,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationService {
-  /// Verifica se o GPS está habilitado
   Future<bool> isLocationEnabled() async {
     return await Geolocator.isLocationServiceEnabled();
   }
 
-  /// Solicita permissões de localização
   Future<LocationPermission> requestPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
 
@@ -18,7 +16,6 @@ class LocationService {
     return permission;
   }
 
-  /// Obtém a localização atual do usuário
   Future<Position?> getCurrentLocation() async {
     try {
       bool serviceEnabled = await isLocationEnabled();
@@ -40,7 +37,6 @@ class LocationService {
     }
   }
 
-  /// Converte coordenadas em endereço
   Future<Map<String, String>> getAddressFromCoordinates(
     double latitude,
     double longitude,
@@ -70,7 +66,6 @@ class LocationService {
     };
   }
 
-  /// Calcula distância entre duas coordenadas (em km)
   double calculateDistance(
     double lat1,
     double lon1,
@@ -80,7 +75,6 @@ class LocationService {
     return Geolocator.distanceBetween(lat1, lon1, lat2, lon2) / 1000;
   }
 
-  /// Verifica se duas localizações estão dentro de uma distância máxima
   bool isWithinDistance(
     double lat1,
     double lon1,

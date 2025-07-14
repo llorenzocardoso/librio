@@ -50,7 +50,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         children: [
           Row(
             children: [
-              // Estrelas
               Row(
                 children: List.generate(5, (index) {
                   return Icon(
@@ -142,7 +141,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Header do perfil
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(24),
@@ -245,7 +243,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                       const SizedBox(height: 24),
 
-                      // Seção de avaliações
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(

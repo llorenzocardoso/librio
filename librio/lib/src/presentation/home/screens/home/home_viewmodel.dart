@@ -19,19 +19,16 @@ class HomeViewModel extends ChangeNotifier {
   final UserProfileRepository _userProfileRepository =
       UserProfileRepositoryImpl();
 
-  // Estado da pesquisa e filtros
   String _searchQuery = '';
   String _selectedCategory = 'Todos';
   List<Book> _filteredBooks = [];
 
-  // Estado de geolocalização
   bool _locationEnabled = false;
   double _maxDistanceKm = 10.0;
   String? _currentLocation;
   bool _isLoadingLocation = false;
   bool _locationPreferencesLoaded = false;
 
-  // Categorias disponíveis (vem das constantes centralizadas)
   static List<String> get categories => BookConstants.categoriesWithAll;
 
   List<Book> get books => _filteredBooks;
@@ -41,7 +38,6 @@ class HomeViewModel extends ChangeNotifier {
   String get selectedCategory => _selectedCategory;
   List<String> get availableCategories => categories;
 
-  // Getters de geolocalização
   bool get locationEnabled => _locationEnabled;
   double get maxDistanceKm => _maxDistanceKm;
   String? get currentLocation => _currentLocation;
@@ -77,7 +73,7 @@ class HomeViewModel extends ChangeNotifier {
         _locationPreferencesLoaded = true;
       });
 
-      // Aplicar filtros após carregar preferências
+
       _applyFilters().then((_) => notifyListeners());
     } catch (e) {
       setState(() {
@@ -98,19 +94,19 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Função para pesquisar livros
+
   void searchBooks(String query) {
     _searchQuery = query.trim();
     _applyFilters().then((_) => notifyListeners());
   }
 
-  // Função para filtrar por categoria
+
   void filterByCategory(String category) {
     _selectedCategory = category;
     _applyFilters().then((_) => notifyListeners());
   }
 
-  // Função para ativar/desativar filtro de localização
+
   void toggleLocationFilter(bool enabled) async {
     _locationEnabled = enabled;
 
@@ -121,24 +117,24 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Função para ativar localização rapidamente (obtém localização real)
+
   Future<void> activateLocationQuickly() async {
     setState(() {
       _isLoadingLocation = true;
     });
 
     try {
-      // Obter localização atual
+
       final position = await _locationService.getCurrentLocation();
 
       if (position != null) {
-        // Converter coordenadas em endereço
+
         final address = await _locationService.getAddressFromCoordinates(
           position.latitude,
           position.longitude,
         );
 
-        // Atualizar perfil do usuário
+
         final user = fb.FirebaseAuth.instance.currentUser;
         if (user != null) {
           await _updateLocationUseCase.execute(
@@ -151,7 +147,7 @@ class HomeViewModel extends ChangeNotifier {
           );
         }
 
-        // Salvar preferências
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('location_enabled', true);
 
@@ -161,14 +157,14 @@ class HomeViewModel extends ChangeNotifier {
           _isLoadingLocation = false;
         });
 
-        // Aplicar filtros
+
         await _applyFilters();
       } else {
         setState(() {
           _isLoadingLocation = false;
         });
 
-        // Se não conseguiu obter localização, mostrar erro
+
         throw Exception('Não foi possível obter sua localização');
       }
     } catch (e) {
@@ -176,12 +172,12 @@ class HomeViewModel extends ChangeNotifier {
         _isLoadingLocation = false;
       });
 
-      // Re-throw para que a UI possa mostrar o erro
+
       rethrow;
     }
   }
 
-  // Função para definir distância máxima
+
   void setMaxDistance(double distance) async {
     _maxDistanceKm = distance;
 
@@ -193,15 +189,15 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  // Aplica todos os filtros (pesquisa + categoria + localização)
+
   Future<void> _applyFilters() async {
-    // Se as preferências ainda não foram carregadas, não mostrar livros
+
     if (!_locationPreferencesLoaded) {
       _filteredBooks = [];
       return;
     }
 
-    // Se localização não está habilitada, não mostrar livros
+
     if (!_locationEnabled) {
       _filteredBooks = [];
       return;
@@ -209,17 +205,17 @@ class HomeViewModel extends ChangeNotifier {
 
     List<Book> books = _bookDataManager.allBooks;
 
-    // Filtro por localização (sempre aplicado quando habilitado)
+
     books = await _applyLocationFilter(books);
 
-    // Filtro por categoria
+
     if (_selectedCategory != 'Todos') {
       books = books.where((book) {
         return book.genre.toLowerCase() == _selectedCategory.toLowerCase();
       }).toList();
     }
 
-    // Filtro por pesquisa
+
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
       books = books.where((book) {
@@ -229,38 +225,38 @@ class HomeViewModel extends ChangeNotifier {
             book.description.toLowerCase().contains(query);
       }).toList();
 
-      // Ordenar por relevância (título primeiro, depois autor)
+
       books.sort((a, b) {
         final aTitle = a.title.toLowerCase();
         final bTitle = b.title.toLowerCase();
         final aAuthor = a.author.toLowerCase();
         final bAuthor = b.author.toLowerCase();
 
-        // Se o título de A contém a query e B não, A vem primeiro
+
         if (aTitle.contains(query) && !bTitle.contains(query)) return -1;
         if (!aTitle.contains(query) && bTitle.contains(query)) return 1;
 
-        // Se ambos contêm no título, ordena alfabeticamente
+
         if (aTitle.contains(query) && bTitle.contains(query)) {
           return aTitle.compareTo(bTitle);
         }
 
-        // Se nenhum contém no título, verifica autor
+
         if (aAuthor.contains(query) && !bAuthor.contains(query)) return -1;
         if (!aAuthor.contains(query) && bAuthor.contains(query)) return 1;
 
-        // Caso padrão: ordem alfabética
+
         return aTitle.compareTo(bTitle);
       });
     } else {
-      // Se não há pesquisa, ordena alfabeticamente por título
+
       books.sort((a, b) => a.title.compareTo(b.title));
     }
 
     _filteredBooks = books;
   }
 
-  // Aplica filtro de localização usando distância real
+
   Future<List<Book>> _applyLocationFilter(List<Book> books) async {
     final user = fb.FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -268,7 +264,7 @@ class HomeViewModel extends ChangeNotifier {
     }
 
     try {
-      // Obter localização do usuário
+
       final userProfile = await _userProfileRepository.getUserProfile(user.uid);
 
       if (userProfile.latitude == null || userProfile.longitude == null) {
@@ -278,14 +274,14 @@ class HomeViewModel extends ChangeNotifier {
         return booksWithCoords;
       }
 
-      // Usar GetBooksByDistanceUseCase para obter livros por distância
+
       final booksWithDistance = await _getBooksByDistanceUseCase.execute(
         userLatitude: userProfile.latitude!,
         userLongitude: userProfile.longitude!,
         maxDistanceKm: _maxDistanceKm,
       );
 
-      // Filtrar apenas os livros que estão na lista original (aplicar outros filtros)
+
       final originalBookIds = books.map((book) => book.id).toSet();
       final filteredBooks = booksWithDistance
           .where((book) => originalBookIds.contains(book.id))

@@ -29,7 +29,7 @@ mixin ProfileViewModel on ChangeNotifier {
 
   void navigateToEditProfile(BuildContext context) async {
     await context.push(AppRoutes.editProfile);
-    // Recarregar perfil quando voltar da tela de edição
+
     fetchUserProfile();
   }
 
@@ -88,7 +88,6 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
   Future<void> fetchUserProfile() async {
     final fb.User? user = _auth.currentUser;
     if (user == null) {
-      // Error está sendo gerenciado pelo BookDataManager
       notifyListeners();
       return;
     }
@@ -114,14 +113,12 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
     if (user == null) return;
 
     try {
-      // Mostrar picker de imagem
       final File? imageFile = await _imagePickerService.pickImage(context);
       if (imageFile == null) return;
 
       isUploadingPhoto = true;
       notifyListeners();
 
-      // Fazer upload da imagem para o Storage
       final String? imageUrl =
           await _storageService.uploadProfileImage(imageFile);
 
@@ -134,13 +131,11 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
         return;
       }
 
-      // Atualizar perfil com a nova foto
       await _updateUserProfileUseCase.execute(
         userId: user.uid,
         photoUrl: imageUrl,
       );
 
-      // Recarregar perfil para mostrar a nova foto
       await fetchUserProfile();
 
       if (context.mounted) {
@@ -160,7 +155,6 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
     }
   }
 
-  // Método para recarregar o perfil (útil quando exchangeCount pode ter mudado)
   Future<void> refreshUserProfile() async {
     await fetchUserProfile();
   }

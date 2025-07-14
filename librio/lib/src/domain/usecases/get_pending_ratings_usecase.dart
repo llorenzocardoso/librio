@@ -9,15 +9,12 @@ class GetPendingRatingsUseCase {
   GetPendingRatingsUseCase(this.exchangeRepository, this.ratingRepository);
 
   Future<List<Exchange>> execute(String userId) async {
-    // Buscar todas as trocas do usuário
     final exchanges = await exchangeRepository.getUserExchanges(userId);
 
-    // Filtrar apenas trocas concluídas
     final completedExchanges = exchanges
         .where((exchange) => exchange.status == ExchangeStatus.completed)
         .toList();
 
-    // Verificar quais trocas ainda não foram avaliadas pelo usuário
     final pendingRatings = <Exchange>[];
 
     for (final exchange in completedExchanges) {

@@ -70,7 +70,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Seção de Status da Localização
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -115,7 +115,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
             const SizedBox(height: 16),
 
-            // Seção de Localização Atual
+
             if (_currentLocation != null) ...[
               Card(
                 child: ListTile(
@@ -131,7 +131,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               const SizedBox(height: 16),
             ],
 
-            // Seção de Erro
+
             if (_error != null) ...[
               Container(
                 padding: const EdgeInsets.all(12),
@@ -156,7 +156,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
               const SizedBox(height: 16),
             ],
 
-            // Botão para obter localização
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -183,7 +183,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Seção de Configurações de Distância
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -210,7 +210,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Slider para distância
+
                     Column(
                       children: [
                         Row(
@@ -252,7 +252,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
                     const SizedBox(height: 16),
 
-                    // Opções rápidas de distância
+
                     const Text(
                       'Opções Rápidas:',
                       style: TextStyle(fontWeight: FontWeight.w600),
@@ -280,7 +280,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
 
             const SizedBox(height: 24),
 
-            // Seção de Informações
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -372,7 +372,7 @@ class _LocationSettingsScreenState extends State<LocationSettingsScreen> {
             address: address['address'],
           );
 
-          // Salvar preferências
+
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('location_enabled', true);
 

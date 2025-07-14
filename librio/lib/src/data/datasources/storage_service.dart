@@ -17,11 +17,9 @@ class StorageService {
       final Reference ref =
           _storage.ref().child('profile_images').child(fileName);
 
-      // Upload do arquivo
       final UploadTask uploadTask = ref.putFile(imageFile);
       final TaskSnapshot snapshot = await uploadTask;
 
-      // Obter URL de download
       final String downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
@@ -38,11 +36,9 @@ class StorageService {
           'book_${userId}_${DateTime.now().millisecondsSinceEpoch}${path.extension(imageFile.path)}';
       final Reference ref = _storage.ref().child('book_images').child(fileName);
 
-      // Upload do arquivo
       final UploadTask uploadTask = ref.putFile(imageFile);
       final TaskSnapshot snapshot = await uploadTask;
 
-      // Obter URL de download
       final String downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
@@ -52,7 +48,6 @@ class StorageService {
 
   Future<bool> deleteProfileImage(String imageUrl) async {
     try {
-      // Extrair o caminho da imagem da URL
       final Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
       return true;
@@ -63,7 +58,6 @@ class StorageService {
 
   Future<bool> deleteBookImage(String imageUrl) async {
     try {
-      // Extrair o caminho da imagem da URL
       final Reference ref = _storage.refFromURL(imageUrl);
       await ref.delete();
       return true;

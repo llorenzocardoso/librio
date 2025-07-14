@@ -1,5 +1,4 @@
 class DateHelper {
-  /// Formatar data em formato relativo (ex: "2h atrás", "3 dias atrás")
   static String formatRelativeTime(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
@@ -19,22 +18,18 @@ class DateHelper {
     }
   }
 
-  /// Formatar data e hora completa
   static String formatFullDateTime(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} às ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  /// Formatar apenas a data
   static String formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
-  /// Formatar apenas o horário
   static String formatTime(DateTime date) {
     return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
-  /// Verificar se é hoje
   static bool isToday(DateTime date) {
     final now = DateTime.now();
     return date.year == now.year &&
@@ -42,7 +37,6 @@ class DateHelper {
         date.day == now.day;
   }
 
-  /// Verificar se foi ontem
   static bool isYesterday(DateTime date) {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     return date.year == yesterday.year &&

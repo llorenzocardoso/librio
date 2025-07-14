@@ -1,9 +1,9 @@
 class Exchange {
   final String id;
-  final String proposerId; // ID do usuário que propôs a troca
-  final String receiverId; // ID do usuário que recebeu a proposta
-  final String proposerBookId; // ID do livro oferecido
-  final String receiverBookId; // ID do livro desejado
+  final String proposerId;
+  final String receiverId;
+  final String proposerBookId;
+  final String receiverBookId;
   final String proposerBookTitle;
   final String receiverBookTitle;
   final String proposerBookImageUrl;
@@ -17,14 +17,14 @@ class Exchange {
   final String proposerName;
   final String receiverName;
   final ExchangeStatus status;
-  final String? message; // Mensagem opcional da proposta
-  final bool proposerConfirmed; // Se o proposer confirmou a conclusão
-  final bool receiverConfirmed; // Se o receiver confirmou a conclusão
-  final DateTime? proposerConfirmedAt; // Quando o proposer confirmou
-  final DateTime? receiverConfirmedAt; // Quando o receiver confirmou
+  final String? message;
+  final bool proposerConfirmed;
+  final bool receiverConfirmed;
+  final DateTime? proposerConfirmedAt;
+  final DateTime? receiverConfirmedAt;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final DateTime? completedAt; // Quando a troca foi concluída
+  final DateTime? completedAt;
 
   Exchange({
     required this.id,
@@ -57,11 +57,11 @@ class Exchange {
 }
 
 enum ExchangeStatus {
-  pending, // Aguardando resposta
-  accepted, // Aceita
-  rejected, // Rejeitada
-  completed, // Concluída
-  cancelled, // Cancelada
+  pending,
+  accepted,
+  rejected,
+  completed,
+  cancelled,
 }
 
 extension ExchangeStatusExtension on ExchangeStatus {

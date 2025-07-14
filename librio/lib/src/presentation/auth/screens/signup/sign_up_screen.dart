@@ -18,7 +18,6 @@ class SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
 
-  // Focus nodes to track which field is selected
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
   late FocusNode _confirmPasswordFocusNode;
@@ -26,7 +25,6 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   late SignUpViewModel viewModel;
 
-  // Estados para controlar visibilidade das senhas
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -193,7 +191,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    // Confirm password
                     TextFormField(
                       focusNode: _confirmPasswordFocusNode,
                       controller: _confirmPasswordController,
@@ -321,7 +318,6 @@ class SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-// Social Button widget
 class _SocialButton extends StatelessWidget {
   final Widget child;
   final VoidCallback onPressed;

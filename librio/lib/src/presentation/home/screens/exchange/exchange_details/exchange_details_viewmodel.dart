@@ -77,7 +77,6 @@ class ExchangeDetailsViewModel extends ChangeNotifier {
       await _confirmExchangeCompletionUseCase.execute(
           exchangeId, currentUser.uid);
 
-      // Verificar se ambos confirmaram
       final repository = ExchangeRepositoryImpl();
       final updatedExchange = await repository.getExchangeById(exchangeId);
       final bothConfirmed = updatedExchange?.status == ExchangeStatus.completed;
@@ -93,7 +92,6 @@ class ExchangeDetailsViewModel extends ChangeNotifier {
         ),
       );
 
-      // Mostrar modal de avaliação apenas se ambos confirmaram
       if (bothConfirmed) {
         _showRatingModal(context, exchange);
       } else {
@@ -173,7 +171,6 @@ class ExchangeDetailsViewModel extends ChangeNotifier {
       ),
     )
         .then((_) {
-      // Verificar novamente se o usuário avaliou após voltar da tela de avaliação
       checkIfUserHasRated(exchange.id);
     });
   }

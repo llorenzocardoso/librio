@@ -74,7 +74,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Book cover image
               Center(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
@@ -91,7 +90,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Title and basic info
               Text(
                 book.title,
                 style: const TextStyle(
@@ -243,13 +241,12 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         ),
       ),
       bottomNavigationBar: viewModel.isOwnBook
-          ? _buildOwnBookButtons(context) // Mostrar botões de editar/excluir se for o próprio livro
+          ? _buildOwnBookButtons(context)
           : Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
               child: viewModel.canChat
                   ? Row(
                       children: [
-                        // Botão de Chat
                         Expanded(
                           flex: 1,
                           child: OutlinedButton.icon(
@@ -290,7 +287,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        // Botão de Propor Troca
                         Expanded(
                           flex: 1,
                           child: ElevatedButton.icon(
@@ -322,7 +318,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       ],
                     )
                   :
-                  // Apenas botão de propor troca quando não pode conversar
                   ElevatedButton.icon(
                       onPressed: () {
                         viewModel.navigateToProposeExchange(context);
@@ -357,7 +352,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
       child: Row(
         children: [
-          // Botão de Editar
           Expanded(
             child: OutlinedButton.icon(
                              onPressed: () {
@@ -386,7 +380,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          // Botão de Excluir
           Expanded(
             child: OutlinedButton.icon(
               onPressed: () => _showDeleteConfirmation(context),
@@ -432,19 +425,16 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // Fechar o dialog
+              Navigator.of(context).pop();
 
               try {
-                // Usar o DeleteBookUseCase para excluir
                 final deleteUseCase = DeleteBookUseCase(BookRepositoryImpl());
                                  await deleteUseCase.execute(widget.book.id);
 
-                // Navegar de volta após sucesso
                 if (context.mounted) {
                   context.pop();
                 }
               } catch (e) {
-                // Mostrar erro se ocorrer
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(

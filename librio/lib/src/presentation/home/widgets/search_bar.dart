@@ -30,7 +30,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
       child: TextField(
         controller: _controller,
         onChanged: (value) {
-          setState(() {}); // Para atualizar o botão de limpar
+          setState(() {});
           widget.onChanged?.call(value);
         },
         decoration: InputDecoration(

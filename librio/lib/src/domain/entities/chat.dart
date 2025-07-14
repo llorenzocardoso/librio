@@ -7,7 +7,7 @@ class Chat {
   final Map<String, int> unreadCount;
   final DateTime createdAt;
   final Map<String, dynamic>
-      participantInfo; // Para armazenar nome e foto dos participantes
+      participantInfo;
 
   const Chat({
     required this.id,

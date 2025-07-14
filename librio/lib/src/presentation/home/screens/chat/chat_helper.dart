@@ -11,10 +11,8 @@ class ChatHelper {
   static final GetUserExchangesUseCase _getUserExchangesUseCase =
       GetUserExchangesUseCase(ExchangeRepositoryImpl());
 
-  /// Verifica se o usuário pode conversar com outro baseado nas trocas
   static Future<bool> canChatWith(
       String currentUserId, String otherUserId) async {
-    // Validação básica de entrada
     if (currentUserId.isEmpty || otherUserId.isEmpty) {
       return false;
     }
@@ -27,7 +25,6 @@ class ChatHelper {
 
       final exchanges = await _getUserExchangesUseCase.execute(currentUserId);
 
-      // Verificar se existe alguma troca ESPECÍFICA entre os dois usuários
       final specificExchange = exchanges.where((exchange) =>
           (exchange.proposerId == currentUserId &&
               exchange.receiverId == otherUserId) ||
@@ -52,11 +49,10 @@ class ChatHelper {
     String currentUserId, {
     String? otherUserName,
     bool forceStart =
-        false, // Para forçar início do chat (ex: após enviar proposta)
+        false,
   }) async {
     try {
 
-      // Verificar se pode conversar (a menos que seja forçado)
       if (!forceStart) {
         final canChat = await canChatWith(currentUserId, otherUserId);
         if (!canChat) {
@@ -71,7 +67,6 @@ class ChatHelper {
         }
       }
 
-      // Mostrar loading
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -80,24 +75,19 @@ class ChatHelper {
         ),
       );
 
-      // Criar ou buscar chat existente
       final chatId =
           await _createOrGetChatUseCase([currentUserId, otherUserId]);
 
-      // Fechar loading
       if (context.mounted) {
         Navigator.of(context).pop();
 
-        // Navegar para o chat
         context
             .push('/chat/$chatId?otherUserName=${otherUserName ?? 'Usuário'}');
       }
     } catch (error) {
-      // Fechar loading
       if (context.mounted) {
         Navigator.of(context).pop();
 
-        // Mostrar erro
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Erro ao iniciar conversa: $error'),
@@ -108,7 +98,6 @@ class ChatHelper {
     }
   }
 
-  /// Formata o tempo da última mensagem
   static String formatLastMessageTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
@@ -124,12 +113,10 @@ class ChatHelper {
     }
   }
 
-  /// Verifica se deve mostrar indicador de não lidas
   static bool hasUnreadMessages(Map<String, int> unreadCount, String userId) {
     return (unreadCount[userId] ?? 0) > 0;
   }
 
-  /// Obtém o número de mensagens não lidas
   static int getUnreadCount(Map<String, int> unreadCount, String userId) {
     return unreadCount[userId] ?? 0;
   }

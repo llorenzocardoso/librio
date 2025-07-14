@@ -15,12 +15,10 @@ class LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // Focus nodes to track which field is selected
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
   late LoginViewModel viewModel;
 
-  // Estado para controlar visibilidade da senha
   bool _obscurePassword = true;
 
   @override
@@ -45,8 +43,8 @@ class LoginScreenState extends State<LoginScreen> {
   void _onLogin() {
     if (_formKey.currentState!.validate()) {
       viewModel.login(
-        _emailController.text.trim(), // Remove espaços em branco
-        _passwordController.text.trim(), // Remove espaços em branco
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
         context,
       );
     }
@@ -116,7 +114,6 @@ class LoginScreenState extends State<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira seu email';
                         }
-                        // Regex mais flexível e padrão para validação de email
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                             .hasMatch(value.trim())) {
                           return 'Por favor, insira um email válido';

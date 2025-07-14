@@ -5,7 +5,7 @@ import 'chat_viewmodel.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
-  final String? otherUserName; // Mantido para compatibilidade, mas não usado
+  final String? otherUserName;
 
   const ChatScreen({
     super.key,
@@ -105,9 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black),
-            onSelected: (value) {
-              // Handle menu actions
-            },
+            onSelected: (value) {},
             itemBuilder: (context) => [
               const PopupMenuItem(
                 value: 'profile',
@@ -123,7 +121,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Column(
         children: [
-          // Messages list
           Expanded(
             child: AnimatedBuilder(
               animation: _viewModel,
@@ -164,7 +161,6 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          // Message input
           _buildMessageInput(),
         ],
       ),
@@ -225,7 +221,6 @@ class _ChatScreenState extends State<ChatScreen> {
         crossAxisAlignment:
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
-          // Data (se necessário) - só mostra se for a primeira mensagem do dia
           if (index == messages.length - 1 ||
               (index < messages.length - 1 &&
                   _shouldShowDate(message, messages[index + 1])))
@@ -249,7 +244,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               ),
             ),
-          // Message bubble
           Row(
             mainAxisAlignment:
                 isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -347,7 +341,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   IconButton(
                     icon: const Icon(Icons.attachment, color: Colors.grey),
                     onPressed: () {
-                      // Handle attachment
                     },
                   ),
                 ],
@@ -377,7 +370,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _viewModel.sendMessage(text);
     _messageController.clear();
 
-    // Scroll to bottom
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         0,

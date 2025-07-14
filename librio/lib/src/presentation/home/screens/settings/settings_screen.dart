@@ -29,7 +29,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _onViewModelChange() {
     setState(() {});
 
-    // Mostrar mensagens de erro ou sucesso
     if (_viewModel.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -78,7 +77,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // Seção de Perfil
                 _buildSectionHeader('Perfil'),
                 _buildSettingsCard([
                   _buildSettingsTile(
@@ -91,20 +89,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 const SizedBox(height: 24),
 
-                // Seção de Conta
                 _buildSectionHeader('Conta'),
                 _buildSettingsCard([
                   _buildSettingsTile(
                     icon: Icons.email_outlined,
                     title: 'Email',
                     subtitle: user?.email ?? 'Não informado',
-                    onTap: null, // Não clicável por enquanto
+                    onTap: null,
                   ),
                 ]),
 
                 const SizedBox(height: 24),
 
-                // Seção de Localização
                 _buildSectionHeader('Localização'),
                 _buildSettingsCard([
                   _buildSettingsTile(
@@ -121,7 +117,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 const SizedBox(height: 24),
 
-                // Botão de Sair
                 _buildSettingsCard([
                   _buildSettingsTile(
                     icon: Icons.logout,
@@ -135,7 +130,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 const SizedBox(height: 32),
 
-                // Informações da versão
                 Center(
                   child: Text(
                     'Librio v1.0.0',
@@ -236,7 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.of(context).pop(); // Fechar dialog
+                Navigator.of(context).pop();
                 await _viewModel.signOut();
                 if (mounted) {
                   _viewModel.navigateToLogin(context);

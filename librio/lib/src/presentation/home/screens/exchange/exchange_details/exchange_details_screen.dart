@@ -40,12 +40,10 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
       final currentUser = fb.FirebaseAuth.instance.currentUser;
       if (currentUser == null) return;
 
-      // Determinar o ID do outro usuário
       final otherUserId = currentUser.uid == exchange.proposerId
           ? exchange.receiverId
           : exchange.proposerId;
 
-      // Navegar para o chat
       await ChatHelper.startChatWith(
         context,
         otherUserId,
@@ -89,12 +87,10 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header com status usando widget modular
             ExchangeHeader(exchange: exchange),
 
             const SizedBox(height: 24),
 
-            // Livros da troca
             const Text(
               'Livros da troca',
               style: TextStyle(
@@ -143,7 +139,6 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
               ],
             ),
 
-            // Mensagem se houver
             const SizedBox(height: 24),
             ExchangeMessageSection(exchange: exchange),
 

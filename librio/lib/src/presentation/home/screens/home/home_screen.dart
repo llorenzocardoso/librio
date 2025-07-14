@@ -35,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
         final isLoading = viewmodel.isLoading;
         final error = viewmodel.error;
 
-        // Categorias disponíveis do ViewModel
         final categories = viewmodel.availableCategories;
         final selectedCategoryIndex =
             categories.indexOf(viewmodel.selectedCategory);
@@ -45,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
             onRefresh: viewmodel.refresh,
             child: CustomScrollView(
               slivers: [
-                // Custom App Bar
                 SliverToBoxAdapter(
                   child: SafeArea(
                     bottom: false,
@@ -71,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           Row(
                             children: [
-                              // Botão de localização
                               IconButton(
                                 onPressed: () {
                                   viewmodel.navigateToLocationSettings(context);
@@ -88,7 +85,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? 'Localização ativada'
                                     : 'Ativar localização',
                               ),
-                              // Botão de notificações
                               NotificationIconWithBadge(
                                 onPressed: () {
                                   Navigator.of(context).push(
@@ -106,14 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                // Campo de busca customizado
                 SliverToBoxAdapter(
                   child: SearchBarWidget(
                     onChanged: (query) => viewmodel.searchBooks(query),
                   ),
                 ),
 
-                // Filtro de categorias
                 SliverToBoxAdapter(
                   child: CategoryFilter(
                     categories: categories,
@@ -125,7 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Título da seção
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -234,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Conteúdo principal
                 if (isLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
@@ -302,14 +294,12 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () => viewmodel.refresh(),
               child: const Text('Tentar novamente'),
             ),
-            // Mostrar botão de logout se for erro de permissão
             if (viewmodel.error?.contains('permissão') == true ||
                 viewmodel.error?.contains('permission') == true)
               Padding(
                 padding: const EdgeInsets.only(top: 12),
                 child: OutlinedButton.icon(
                   onPressed: () async {
-                    // Fazer logout direto
                     try {
                       await FirebaseAuth.instance.signOut();
                       if (context.mounted) {

@@ -6,13 +6,11 @@ class CreateOrGetChatUseCase {
   CreateOrGetChatUseCase(this._repository);
 
   Future<String> call(List<String> participantIds) async {
-    // Validações de domínio
     _validateParticipants(participantIds);
 
     return await _repository.createOrGetChat(participantIds);
   }
 
-  /// Validações de domínio para participantes do chat
   void _validateParticipants(List<String> participantIds) {
     if (participantIds.isEmpty) {
       throw ArgumentError('Lista de participantes não pode estar vazia');
@@ -34,7 +32,6 @@ class CreateOrGetChatUseCase {
           'Não é possível criar chat: usuário não pode conversar consigo mesmo');
     }
 
-    // Verificar se não há IDs duplicados
     final uniqueIds = participantIds.toSet();
     if (uniqueIds.length != participantIds.length) {
       throw ArgumentError('IDs de participantes duplicados encontrados');

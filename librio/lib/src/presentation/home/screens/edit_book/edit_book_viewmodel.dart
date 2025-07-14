@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:librio/src/data/data.dart';
 import 'package:librio/src/domain/domain.dart';
-import 'package:librio/src/shared/shared.dart';
 import 'package:librio/src/domain/usecases/update_book_usecase.dart';
 import 'package:librio/src/domain/usecases/delete_book_usecase.dart';
 import 'package:librio/src/data/datasources/location_service.dart';
@@ -22,7 +21,6 @@ class EditBookViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
-  // Location data
   double? _latitude;
   double? _longitude;
   String? _city;
@@ -43,7 +41,6 @@ class EditBookViewModel extends ChangeNotifier {
         _imagePickerService = imagePickerService ?? ImagePickerService(),
         _locationService = locationService ?? LocationService();
 
-  // Getters
   Book? get originalBook => _originalBook;
   File? get selectedImageFile => _selectedImageFile;
   String? get currentImageUrl => _currentImageUrl;
@@ -96,7 +93,6 @@ class EditBookViewModel extends ChangeNotifier {
         _latitude = location.latitude;
         _longitude = location.longitude;
 
-        // Converter coordenadas para endereço
         if (_latitude != null && _longitude != null) {
           final address = await _locationService.getAddressFromCoordinates(
             _latitude!,
@@ -136,20 +132,17 @@ class EditBookViewModel extends ChangeNotifier {
     try {
       String? imageUrl = _currentImageUrl;
 
-      // Upload da nova imagem se selecionada
       if (_selectedImageFile != null) {
         _isUploadingImage = true;
         notifyListeners();
 
         imageUrl = await _storageService.uploadBookImage(_selectedImageFile!);
 
-        // Deletar imagem antiga se existir
         if (_currentImageUrl != null && _currentImageUrl!.isNotEmpty) {
           try {
             await _storageService.deleteBookImage(_currentImageUrl!);
           } catch (e) {
-            // Log do erro, mas não falha a operação
-            print('Erro ao deletar imagem antiga: $e');
+            throw Exception('Erro ao deletar imagem antiga: $e');
           }
         }
 
@@ -171,7 +164,6 @@ class EditBookViewModel extends ChangeNotifier {
         state: _state,
       );
 
-      // Navegar de volta após sucesso
       if (context.mounted) {
         context.pop();
       }
@@ -198,7 +190,6 @@ class EditBookViewModel extends ChangeNotifier {
     try {
       await _deleteBookUseCase.execute(_originalBook!.id);
 
-      // Navegar de volta após sucesso
       if (context.mounted) {
         context.pop();
       }

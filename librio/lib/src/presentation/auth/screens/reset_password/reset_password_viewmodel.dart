@@ -27,7 +27,6 @@ class ResetPasswordViewModel extends ChangeNotifier {
       _successMessage =
           'Email de redefinição enviado com sucesso!\n\nVerifique sua caixa de entrada e pasta de spam.\n\nO email pode levar alguns minutos para chegar.';
     } catch (e) {
-      // Tratamento específico para erros do Firebase Auth
       if (e is firebase_auth.FirebaseAuthException) {
         switch (e.code) {
           case 'user-not-found':

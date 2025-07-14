@@ -59,7 +59,6 @@ class _PendingRatingsNotificationState
       ),
     )
         .then((_) {
-      // Recarregar após voltar da tela de avaliação
       _loadPendingRatings();
     });
   }

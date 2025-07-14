@@ -54,7 +54,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Seção de foto do livro (obrigatória)
               Column(
                 children: [
                   const Row(
@@ -176,7 +175,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Título
               const Text(
                 'Título do livro',
                 style: TextStyle(
@@ -200,7 +198,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Autor
               const Text(
                 'Autor',
                 style: TextStyle(
@@ -224,7 +221,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Gênero
               const Text(
                 'Gênero',
                 style: TextStyle(
@@ -286,7 +282,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Descrição
               const Text(
                 'Descrição',
                 style: TextStyle(
@@ -411,7 +406,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
             ),
           ),
         );
-        // Navegar de volta para a home e forçar atualização
         viewModel.navigateToHome(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

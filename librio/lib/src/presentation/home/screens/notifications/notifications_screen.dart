@@ -110,7 +110,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Avaliações pendentes
           if (data.pendingRatings.isNotEmpty) ...[
             _buildSectionHeader('Avaliações pendentes'),
             ...data.pendingRatings.map((exchange) => PendingRatingCard(
@@ -120,7 +119,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 24),
           ],
 
-          // Propostas de troca pendentes
           if (data.pendingExchanges.isNotEmpty) ...[
             _buildSectionHeader('Novas propostas'),
             ...data.pendingExchanges
@@ -132,7 +130,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 24),
           ],
 
-          // Trocas aceitas recentemente
           if (data.recentAcceptedExchanges.isNotEmpty) ...[
             _buildSectionHeader('Propostas aceitas'),
             ...data.recentAcceptedExchanges
@@ -144,7 +141,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             const SizedBox(height: 24),
           ],
 
-          // Trocas recentes
           if (data.recentExchanges.isNotEmpty) ...[
             _buildSectionHeader('Atividade recente'),
             ...data.recentExchanges

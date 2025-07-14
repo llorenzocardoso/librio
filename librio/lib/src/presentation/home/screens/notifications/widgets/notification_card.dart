@@ -136,7 +136,6 @@ class PendingRatingCard extends StatelessWidget {
   }
 
   String _getOtherUserName() {
-    // Esta lógica pode ser melhorada com informações do usuário atual
     return exchange.proposerName.isNotEmpty
         ? exchange.proposerName
         : exchange.receiverName;
@@ -145,7 +144,7 @@ class PendingRatingCard extends StatelessWidget {
 
 class ExchangeNotificationCard extends StatelessWidget {
   final Exchange exchange;
-  final String type; // 'pending', 'accepted', 'recent'
+  final String type;
   final VoidCallback onTap;
   final VoidCallback? onAction;
   final String? actionText;
@@ -315,7 +314,6 @@ class ExchangeNotificationCard extends StatelessWidget {
           return color;
       }
     } else {
-      // Para Colors.grey ou outras cores sem shade
       switch (shade) {
         case 50:
           return Colors.grey.shade50;

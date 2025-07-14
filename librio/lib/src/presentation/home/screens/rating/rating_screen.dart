@@ -27,7 +27,6 @@ class _RatingScreenState extends State<RatingScreen> {
     );
     viewModel.addListener(() => setState(() {}));
 
-    // Carregar informações do usuário que está sendo avaliado
     viewModel.loadUserProfile(evaluatedUserId);
   }
 
@@ -77,7 +76,6 @@ class _RatingScreenState extends State<RatingScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Informações da troca
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -185,7 +183,6 @@ class _RatingScreenState extends State<RatingScreen> {
 
             const SizedBox(height: 32),
 
-            // Avaliação por estrelas
             const Text(
               'Como foi sua experiência?',
               style: TextStyle(
@@ -233,7 +230,6 @@ class _RatingScreenState extends State<RatingScreen> {
 
             const SizedBox(height: 32),
 
-            // Campo de mensagem
             const Text(
               'Deixe um comentário (opcional)',
               style: TextStyle(
@@ -261,7 +257,6 @@ class _RatingScreenState extends State<RatingScreen> {
 
             const SizedBox(height: 32),
 
-            // Botão de enviar
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

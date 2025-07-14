@@ -49,7 +49,6 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
   @override
   void didUpdateWidget(NotificationIconWithBadge oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Recarregar quando o widget for atualizado
     _loadNotificationCount();
   }
 
@@ -63,23 +62,18 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
     }
 
     try {
-      // Buscar exchanges já vistas
       final viewedExchangeIds =
           await _notificationService.getViewedExchangeIds();
       final lastViewedTime = await _notificationService.getLastViewedTime();
 
-      // Buscar avaliações pendentes
       final pendingRatings = await _getPendingRatingsUseCase.execute(user.uid);
 
-      // Buscar propostas de troca pendentes (recebidas)
       final pendingExchanges =
           await _getPendingExchangesUseCase.execute(user.uid);
 
-      // Buscar trocas aceitas recentemente (para quem propôs)
       final recentAcceptedExchanges =
           await _getRecentAcceptedExchangesUseCase.execute(user.uid);
 
-      // Filtrar notificações já vistas
       final unviewedPendingExchanges = pendingExchanges
           .where((exchange) => !viewedExchangeIds.contains(exchange.id))
           .toList();
@@ -91,7 +85,6 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
                   (exchange.updatedAt?.isAfter(lastViewedTime) ?? false)))
           .toList();
 
-      // Avaliações pendentes sempre aparecem (são importantes)
       final unviewedRatings = pendingRatings;
 
       if (mounted) {
@@ -109,7 +102,6 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
     }
   }
 
-  /// Método público para forçar recarga das notificações
   void refresh() {
     if (mounted) {
       _loadNotificationCount();
@@ -118,7 +110,7 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
 
     return Stack(
       children: [
@@ -130,7 +122,6 @@ class _NotificationIconWithBadgeState extends State<NotificationIconWithBadge>
           ),
           onPressed: () {
             widget.onPressed();
-            // Recarregar após o usuário interagir com notificações
             Future.delayed(const Duration(milliseconds: 500), () {
               if (mounted) {
                 _loadNotificationCount();

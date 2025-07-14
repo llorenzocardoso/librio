@@ -15,7 +15,6 @@ class ProcessExchangeTimeoutsUseCase {
         final now = DateTime.now();
         bool needsUpdate = false;
 
-        // Verificar se pode auto-confirmar por timeout
         if (!exchange.proposerConfirmed &&
             exchange.receiverConfirmedAt != null) {
           final hoursSinceReceiverConfirmed =

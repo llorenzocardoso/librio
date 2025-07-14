@@ -21,7 +21,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     viewModel.addListener(() => setState(() {}));
     viewModel.loadCurrentProfile();
 
-    // Preencher campos quando o perfil for carregado
     viewModel.addListener(_updateControllers);
   }
 
@@ -101,7 +100,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // Seção da foto de perfil
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -172,7 +170,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Seção dos dados do perfil
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -192,7 +189,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                         const SizedBox(height: 20),
 
-                        // Campo Nome
                         const Text(
                           'Nome *',
                           style: TextStyle(
@@ -233,7 +229,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                         const SizedBox(height: 20),
 
-                        // Campo Descrição
                         const Text(
                           'Sobre você',
                           style: TextStyle(
@@ -280,7 +275,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                   const SizedBox(height: 32),
 
-                  // Botão Salvar
                   SizedBox(
                     width: double.infinity,
                     height: 56,

@@ -22,12 +22,10 @@ class LoginViewModel extends ChangeNotifier {
       user = await _useCase.execute(email, password);
       error = null;
 
-      // Navegar para home se login bem-sucedido
       if (user != null) {
         context.go(AppRoutes.home);
       }
     } catch (e) {
-      // Tratamento específico para erros do Firebase Auth
       if (e is firebase_auth.FirebaseAuthException) {
         switch (e.code) {
           case 'user-not-found':

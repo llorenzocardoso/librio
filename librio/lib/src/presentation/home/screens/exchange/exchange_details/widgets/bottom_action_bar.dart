@@ -17,18 +17,15 @@ class BottomActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Botão para aceitar proposta (apenas para receiver em propostas pendentes)
     if (viewModel.isReceiver(exchange) &&
         exchange.status == ExchangeStatus.pending) {
       return _buildAcceptButton();
     }
 
-    // Botões para trocas aceitas (chat + marcar como concluída)
     if (exchange.status == ExchangeStatus.accepted) {
       return _buildAcceptedButtons();
     }
 
-    // Botão para avaliar (apenas para trocas concluídas)
     if (exchange.status == ExchangeStatus.completed) {
       return _buildRatingButton();
     }
@@ -70,7 +67,6 @@ class BottomActionBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Botão para iniciar conversa
           ElevatedButton.icon(
             onPressed: () => _startChat(exchange),
             icon: const Icon(Icons.chat, size: 18),
@@ -88,7 +84,6 @@ class BottomActionBar extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          // Botão para marcar como concluída
           ElevatedButton(
             onPressed: viewModel.isLoading
                 ? null
@@ -164,12 +159,10 @@ class BottomActionBar extends StatelessWidget {
       final currentUser = fb.FirebaseAuth.instance.currentUser;
       if (currentUser == null) return;
 
-      // Determinar o ID do outro usuário
       final otherUserId = currentUser.uid == exchange.proposerId
           ? exchange.receiverId
           : exchange.proposerId;
 
-      // Navegar para o chat
       await ChatHelper.startChatWith(
         context,
         otherUserId,

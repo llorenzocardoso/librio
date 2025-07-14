@@ -30,7 +30,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
     viewModel.setBook(widget.book);
     viewModel.addListener(() => setState(() {}));
 
-    // Pre-populate form fields
     titleController = TextEditingController(text: widget.book.title);
     authorController = TextEditingController(text: widget.book.author);
     selectedGenre = widget.book.genre;
@@ -79,17 +78,13 @@ class _EditBookScreenState extends State<EditBookScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Seção de foto do livro
               _buildImageSection(),
               const SizedBox(height: 24),
 
-              // Campos do formulário
               _buildFormFields(),
 
-              // Localização
               _buildLocationSection(),
 
-              // Mostrar erros
               if (viewModel.error != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -122,7 +117,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
 
               const SizedBox(height: 32),
 
-              // Botão de salvar
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -310,7 +304,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título
         const Text(
           'Título do livro',
           style: TextStyle(
@@ -334,7 +327,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Autor
         const Text(
           'Autor',
           style: TextStyle(
@@ -358,7 +350,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Gênero
         const Text(
           'Gênero',
           style: TextStyle(
@@ -393,7 +384,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Condição
         const Text(
           'Condição do livro',
           style: TextStyle(
@@ -432,7 +422,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
         ),
         const SizedBox(height: 16),
 
-        // Descrição
         const Text(
           'Descrição',
           style: TextStyle(

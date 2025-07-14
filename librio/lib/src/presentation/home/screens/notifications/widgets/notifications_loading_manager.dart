@@ -32,23 +32,18 @@ class NotificationsLoadingManager {
     }
 
     try {
-      // Buscar exchanges já vistas
       final viewedExchangeIds =
           await _notificationService.getViewedExchangeIds();
       final lastViewedTime = await _notificationService.getLastViewedTime();
 
-      // Carregar avaliações pendentes
       final pending = await _getPendingRatingsUseCase.execute(user.uid);
 
-      // Carregar propostas de troca pendentes (recebidas)
       final pendingProposals =
           await _getPendingExchangesUseCase.execute(user.uid);
 
-      // Carregar trocas aceitas recentemente (propostas aceitas)
       final acceptedProposals =
           await _getRecentAcceptedExchangesUseCase.execute(user.uid);
 
-      // Filtrar notificações já vistas
       final unviewedPendingExchanges = pendingProposals
           .where((exchange) => !viewedExchangeIds.contains(exchange.id))
           .toList();
@@ -60,7 +55,6 @@ class NotificationsLoadingManager {
                   (exchange.updatedAt?.isAfter(lastViewedTime) ?? false)))
           .toList();
 
-      // Carregar trocas recentes (últimos 7 dias)
       final allExchanges = await _getUserExchangesUseCase.execute(user.uid);
       final recent = _filterRecentExchanges(
         allExchanges,
@@ -68,7 +62,6 @@ class NotificationsLoadingManager {
         unviewedAcceptedExchanges,
       );
 
-      // Marcar notificações como vistas
       final allCurrentNotificationIds = [
         ...unviewedPendingExchanges.map((e) => e.id),
         ...unviewedAcceptedExchanges.map((e) => e.id),
@@ -100,7 +93,6 @@ class NotificationsLoadingManager {
     final oneDayAgo = now.subtract(const Duration(hours: 24));
 
     final recent = allExchanges.where((exchange) {
-      // Não incluir exchanges que já estão em outras seções
       final isAlreadyShown =
           unviewedPendingExchanges.any((e) => e.id == exchange.id) ||
               unviewedAcceptedExchanges.any((e) => e.id == exchange.id);
@@ -110,13 +102,11 @@ class NotificationsLoadingManager {
           (exchange.status == ExchangeStatus.accepted ||
               exchange.status == ExchangeStatus.completed ||
               exchange.status == ExchangeStatus.rejected) &&
-          // Para exchanges aceitas, só mostrar se não foi aceita nas últimas 24h
           !(exchange.status == ExchangeStatus.accepted &&
               exchange.updatedAt != null &&
               exchange.updatedAt!.isAfter(oneDayAgo));
     }).toList();
 
-    // Ordenar por data (mais recente primeiro)
     recent.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return recent;

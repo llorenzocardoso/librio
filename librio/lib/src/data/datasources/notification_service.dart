@@ -12,7 +12,6 @@ class NotificationService {
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? fb.FirebaseAuth.instance;
 
-  /// Marcar exchanges específicas como vistas
   Future<void> markExchangesAsViewed(List<String> exchangeIds) async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -27,7 +26,6 @@ class NotificationService {
         currentViewed = List<String>.from(data['viewedExchangeIds'] ?? []);
       }
 
-      // Adicionar novos IDs sem duplicar
       final updatedViewed = {...currentViewed, ...exchangeIds}.toList();
 
       await docRef.set({
@@ -40,7 +38,6 @@ class NotificationService {
     }
   }
 
-  /// Marcar todas as notificações como vistas
   Future<void> markAllAsViewed() async {
     final user = _auth.currentUser;
     if (user == null) return;
@@ -56,7 +53,6 @@ class NotificationService {
     }
   }
 
-  /// Obter exchanges que já foram vistas
   Future<List<String>> getViewedExchangeIds() async {
     final user = _auth.currentUser;
     if (user == null) return [];
@@ -76,7 +72,6 @@ class NotificationService {
     }
   }
 
-  /// Obter timestamp da última visualização
   Future<DateTime?> getLastViewedTime() async {
     final user = _auth.currentUser;
     if (user == null) return null;

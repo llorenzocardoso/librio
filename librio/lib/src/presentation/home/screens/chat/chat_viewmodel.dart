@@ -23,7 +23,6 @@ class ChatViewModel extends ChangeNotifier {
   String? _error;
   StreamSubscription? _messagesSubscription;
 
-  // Informações do outro usuário
   String? _otherUserId;
   String? _otherUserName;
   String? _otherUserPhotoUrl;
@@ -71,7 +70,6 @@ class ChatViewModel extends ChangeNotifier {
     try {
       final chat = await _getChatUseCase.execute(chatId);
       if (chat != null) {
-        // Determinar o ID do outro usuário
         final currentUser = currentUserId;
         _otherUserId = chat.participantIds.firstWhere(
           (id) => id != currentUser,
@@ -79,14 +77,12 @@ class ChatViewModel extends ChangeNotifier {
         );
 
         if (_otherUserId != null && _otherUserId!.isNotEmpty) {
-          // Verificar se já tem informações no participantInfo
           final otherUserInfo = chat.participantInfo[_otherUserId];
           if (otherUserInfo != null) {
             _otherUserName = otherUserInfo['name'];
             _otherUserPhotoUrl = otherUserInfo['photoUrl'];
             notifyListeners();
           } else {
-            // Se não tem, buscar do Firestore
             _loadOtherUserInfo();
           }
         }
