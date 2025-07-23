@@ -80,11 +80,8 @@ class _EditBookScreenState extends State<EditBookScreen> {
             children: [
               _buildImageSection(),
               const SizedBox(height: 24),
-
               _buildFormFields(),
-
               _buildLocationSection(),
-
               if (viewModel.error != null) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -114,9 +111,7 @@ class _EditBookScreenState extends State<EditBookScreen> {
                   ),
                 ),
               ],
-
               const SizedBox(height: 32),
-
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -269,7 +264,8 @@ class _EditBookScreenState extends State<EditBookScreen> {
             if (loadingProgress == null) return child;
             return const Center(child: CircularProgressIndicator());
           },
-          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(),
+          errorBuilder: (context, error, stackTrace) =>
+              _buildImagePlaceholder(),
         ),
       );
     } else {
@@ -326,7 +322,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
           ),
         ),
         const SizedBox(height: 16),
-
         const Text(
           'Autor',
           style: TextStyle(
@@ -349,7 +344,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
           ),
         ),
         const SizedBox(height: 16),
-
         const Text(
           'Gênero',
           style: TextStyle(
@@ -383,7 +377,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
           },
         ),
         const SizedBox(height: 16),
-
         const Text(
           'Condição do livro',
           style: TextStyle(
@@ -403,9 +396,8 @@ class _EditBookScreenState extends State<EditBookScreen> {
                 IconButton(
                   icon: Icon(
                     Icons.star,
-                    color: isSelected
-                        ? const Color(0xFF1D4ED8)
-                        : Colors.grey[400],
+                    color:
+                        isSelected ? const Color(0xFF1D4ED8) : Colors.grey[400],
                   ),
                   onPressed: () => setState(() => conditionIndex = idx),
                 ),
@@ -421,7 +413,6 @@ class _EditBookScreenState extends State<EditBookScreen> {
           }).toList(),
         ),
         const SizedBox(height: 16),
-
         const Text(
           'Descrição',
           style: TextStyle(

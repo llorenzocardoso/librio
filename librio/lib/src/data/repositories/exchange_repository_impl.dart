@@ -22,7 +22,6 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
     final fb.User? user = _auth.currentUser;
     if (user == null) throw Exception('Usuário não autenticado');
 
-    // Buscar informações dos livros e usuários
     final proposerBookDoc =
         await _firestore.collection('books').doc(proposerBookId).get();
     final receiverBookDoc =
@@ -35,14 +34,25 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
     final proposerBookData = proposerBookDoc.data()!;
     final receiverBookData = receiverBookDoc.data()!;
 
-    // Buscar informações dos usuários (assumindo que temos displayName no auth)
     final proposerName = user.displayName ?? user.email ?? 'Usuário';
 
-    // Buscar nome do receiver (por enquanto usando um valor padrão)
     String receiverName = 'Usuário';
     try {
-      // Aqui você pode implementar uma busca no perfil do usuário se necessário
-      receiverName = 'Usuário';
+      // Tentar buscar do perfil do usuário receptor
+      final receiverProfileDoc =
+          await _firestore.collection('user_profiles').doc(receiverId).get();
+      if (receiverProfileDoc.exists) {
+        final receiverData = receiverProfileDoc.data() as Map<String, dynamic>;
+        receiverName = receiverData['name'] ?? 'Usuário';
+      } else {
+        // Fallback para coleção users
+        final receiverUserDoc =
+            await _firestore.collection('users').doc(receiverId).get();
+        if (receiverUserDoc.exists) {
+          final receiverData = receiverUserDoc.data() as Map<String, dynamic>;
+          receiverName = receiverData['name'] ?? 'Usuário';
+        }
+      }
     } catch (e) {
       receiverName = 'Usuário';
     }
@@ -75,7 +85,6 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
 
   @override
   Future<List<Exchange>> getUserExchanges(String userId) async {
-    // Buscar trocas onde o usuário é proposer ou receiver
     final proposerQuery = await _firestore
         .collection('exchanges')
         .where('proposerId', isEqualTo: userId)
@@ -88,8 +97,13 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
 
     final allDocs = [...proposerQuery.docs, ...receiverQuery.docs];
 
-    return allDocs.map((doc) => _mapDocumentToExchange(doc)).toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final exchanges = <Exchange>[];
+    for (final doc in allDocs) {
+      final exchange = await _mapDocumentToExchange(doc);
+      exchanges.add(exchange);
+    }
+
+    return exchanges..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   @override
@@ -105,7 +119,7 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
   Future<Exchange?> getExchangeById(String exchangeId) async {
     final doc = await _firestore.collection('exchanges').doc(exchangeId).get();
     if (!doc.exists) return null;
-    return _mapDocumentToExchange(doc);
+    return await _mapDocumentToExchange(doc);
   }
 
   @override
@@ -129,7 +143,6 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
 
     final now = DateTime.now();
 
-    // Marcar confirmação do usuário atual
     if (userId == proposerId && !proposerConfirmed) {
       proposerConfirmed = true;
       proposerConfirmedAt = now;
@@ -138,7 +151,6 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
       receiverConfirmedAt = now;
     }
 
-    // Verificar auto-confirmação por timeout (48h após primeira confirmação)
     if (!proposerConfirmed && receiverConfirmedAt != null) {
       final hoursSinceReceiverConfirmed =
           now.difference(receiverConfirmedAt).inHours;
@@ -157,7 +169,6 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
       }
     }
 
-    // Verificar se ambos confirmaram
     final bothConfirmed = proposerConfirmed && receiverConfirmed;
     final newStatus =
         bothConfirmed ? ExchangeStatus.completed : ExchangeStatus.accepted;
@@ -177,45 +188,170 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
     });
 
     if (bothConfirmed) {
-      // EXCLUIR os livros da base de dados (não apenas marcar como indisponível)
       await _firestore.collection('books').doc(data['proposerBookId']).delete();
       await _firestore.collection('books').doc(data['receiverBookId']).delete();
 
-      // Incrementar contador de trocas para ambos os usuários
       await _incrementExchangeCount(proposerId);
       await _incrementExchangeCount(receiverId);
 
-      // Notificar BookDataManager sobre mudanças nos livros
       await BookDataManager().notifyBookDataChanged();
-    } else {
-    }
+
+      UserProfileManager().notifyProfileChanged();
+    } else {}
   }
 
   Future<void> _incrementExchangeCount(String userId) async {
     try {
       final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        final currentCount = userDoc.data()?['exchangeCount'] ?? 0;
+        final newCount = currentCount + 1;
 
-      if (!userDoc.exists) {
-        return;
+        await _firestore.collection('users').doc(userId).update({
+          'exchangeCount': newCount,
+        });
       }
 
-      final currentCount = userDoc.data()?['exchangeCount'] ?? 0;
-      final newCount = currentCount + 1;
+      final userProfileDoc =
+          await _firestore.collection('user_profiles').doc(userId).get();
+      if (userProfileDoc.exists) {
+        final currentCount = userProfileDoc.data()?['exchangeCount'] ?? 0;
+        final newCount = currentCount + 1;
 
-      await _firestore.collection('users').doc(userId).update({
-        'exchangeCount': newCount,
-      });
+        await _firestore.collection('user_profiles').doc(userId).update({
+          'exchangeCount': newCount,
+        });
+      } else {
+        final userData =
+            userDoc.exists ? userDoc.data() as Map<String, dynamic> : {};
+        final initialCount = (userData['exchangeCount'] ?? 0) + 1;
 
-      // Verificar se foi atualizado corretamente
-      final updatedDoc = await _firestore.collection('users').doc(userId).get();
-      final finalCount = updatedDoc.data()?['exchangeCount'] ?? 0;
+        // Tentar obter nome mais apropriado
+        String userName = userData['name'] ?? 'Usuário';
+        String userEmail = userData['email'] ?? '';
+        String userPhotoUrl = userData['photoUrl'] ?? '';
+
+        // Se não há dados locais, tentar do Firebase Auth
+        if (userName == 'Usuário' || userName.isEmpty) {
+          try {
+            final user = _auth.currentUser;
+            if (user != null && user.uid == userId) {
+              userName =
+                  user.displayName ?? user.email?.split('@')[0] ?? 'Usuário';
+              userEmail = user.email ?? userEmail;
+              userPhotoUrl = user.photoURL ?? userPhotoUrl;
+            }
+          } catch (e) {
+            // Ignorar erros do Firebase Auth
+          }
+        }
+
+        await _firestore.collection('user_profiles').doc(userId).set({
+          'name': userName,
+          'email': userEmail,
+          'description': userData['description'] ?? '',
+          'averageRating': userData['averageRating'] ?? 0.0,
+          'ratingCount': userData['ratingCount'] ?? 0,
+          'exchangeCount': initialCount,
+          'photoUrl': userPhotoUrl,
+          'ratings': userData['ratings'] ?? [],
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
     } catch (e) {
       rethrow;
     }
   }
 
-  Exchange _mapDocumentToExchange(DocumentSnapshot doc) {
+  /// Método para corrigir nomes de usuários em trocas existentes
+  Future<void> fixExistingExchangeNames() async {
+    try {
+      final exchangesSnapshot = await _firestore.collection('exchanges').get();
+
+      for (final doc in exchangesSnapshot.docs) {
+        final data = doc.data();
+        bool needsUpdate = false;
+        final Map<String, dynamic> updateData = {};
+
+        // Verificar se precisa atualizar o nome do proposer
+        if (data['proposerName'] == null ||
+            data['proposerName'] == 'Usuário' ||
+            data['proposerName'].isEmpty) {
+          final proposerName = await _getUserName(data['proposerId']);
+          if (proposerName != 'Usuário') {
+            updateData['proposerName'] = proposerName;
+            needsUpdate = true;
+          }
+        }
+
+        // Verificar se precisa atualizar o nome do receiver
+        if (data['receiverName'] == null ||
+            data['receiverName'] == 'Usuário' ||
+            data['receiverName'].isEmpty) {
+          final receiverName = await _getUserName(data['receiverId']);
+          if (receiverName != 'Usuário') {
+            updateData['receiverName'] = receiverName;
+            needsUpdate = true;
+          }
+        }
+
+        if (needsUpdate) {
+          await _firestore
+              .collection('exchanges')
+              .doc(doc.id)
+              .update(updateData);
+        }
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Método auxiliar para buscar o nome de um usuário
+  Future<String> _getUserName(String userId) async {
+    try {
+      // Tentar buscar do perfil do usuário
+      final userProfileDoc =
+          await _firestore.collection('user_profiles').doc(userId).get();
+      if (userProfileDoc.exists) {
+        final userData = userProfileDoc.data() as Map<String, dynamic>;
+        final name = userData['name'];
+        if (name != null && name.isNotEmpty && name != 'Usuário') {
+          return name;
+        }
+      }
+
+      // Fallback para coleção users
+      final userDoc = await _firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        final userData = userDoc.data() as Map<String, dynamic>;
+        final name = userData['name'];
+        if (name != null && name.isNotEmpty && name != 'Usuário') {
+          return name;
+        }
+      }
+
+      return 'Usuário';
+    } catch (e) {
+      return 'Usuário';
+    }
+  }
+
+  Future<Exchange> _mapDocumentToExchange(DocumentSnapshot doc) async {
     final data = doc.data() as Map<String, dynamic>;
+
+    // Verificar se os nomes estão presentes e válidos, se não buscar novamente
+    String proposerName = data['proposerName'] ?? 'Usuário';
+    String receiverName = data['receiverName'] ?? 'Usuário';
+
+    if (proposerName == 'Usuário' || proposerName.isEmpty) {
+      proposerName = await _getUserName(data['proposerId']);
+    }
+
+    if (receiverName == 'Usuário' || receiverName.isEmpty) {
+      receiverName = await _getUserName(data['receiverId']);
+    }
+
     return Exchange(
       id: doc.id,
       proposerId: data['proposerId'],
@@ -232,8 +368,8 @@ class ExchangeRepositoryImpl implements ExchangeRepository {
       receiverBookGenre: data['receiverBookGenre'] ?? '',
       proposerBookCondition: data['proposerBookCondition'] ?? '',
       receiverBookCondition: data['receiverBookCondition'] ?? '',
-      proposerName: data['proposerName'],
-      receiverName: data['receiverName'],
+      proposerName: proposerName,
+      receiverName: receiverName,
       status: ExchangeStatus.values.firstWhere(
         (e) => e.name == data['status'],
         orElse: () => ExchangeStatus.pending,

@@ -174,7 +174,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ],
               ),
               const SizedBox(height: 24),
-
               const Text(
                 'Título do livro',
                 style: TextStyle(
@@ -197,7 +196,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const Text(
                 'Autor',
                 style: TextStyle(
@@ -220,7 +218,6 @@ class _AddBookScreenState extends State<AddBookScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const Text(
                 'Gênero',
                 style: TextStyle(
@@ -230,39 +227,64 @@ class _AddBookScreenState extends State<AddBookScreen> {
               ),
               const SizedBox(height: 8),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE4EAFF),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: DropdownButtonFormField<String>(
                   value: selectedGenre,
-                  hint: const Text('Selecione uma categoria'),
+                  hint: const Text(
+                    'Selecione uma categoria',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
                   isExpanded: true,
                   decoration: const InputDecoration(
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
                   onChanged: (val) => setState(() => selectedGenre = val),
-                  menuMaxHeight: 250,
+                  menuMaxHeight: 300,
                   style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
                   dropdownColor: Colors.white,
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down,
-                    color: Colors.grey,
+                  icon: Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    child: const Icon(
+                      Icons.keyboard_arrow_down,
+                      color: Colors.grey,
+                    ),
                   ),
                   elevation: 8,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(8),
+                  selectedItemBuilder: (BuildContext context) {
+                    return genres.map<Widget>((String item) {
+                      return Container(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          item,
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList();
+                  },
                   items: genres
                       .map(
                         (g) => DropdownMenuItem(
                           value: g,
                           child: Container(
+                            width: double.infinity,
                             padding: const EdgeInsets.symmetric(
                               vertical: 8,
                               horizontal: 4,

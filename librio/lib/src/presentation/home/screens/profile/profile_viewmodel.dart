@@ -13,7 +13,8 @@ mixin ProfileViewModel on ChangeNotifier {
   List<Book> get books => BookDataManager().userBooks;
   UserProfile? userProfile;
   List<Rating> ratings = [];
-  List<Rating> get ratingsWithComments => ratings.where((rating) => rating.message.trim().isNotEmpty).toList();
+  List<Rating> get ratingsWithComments =>
+      ratings.where((rating) => rating.message.trim().isNotEmpty).toList();
   bool get isLoading => BookDataManager().isLoading;
   bool isLoadingProfile = false;
   bool isUploadingPhoto = false;
@@ -22,6 +23,7 @@ mixin ProfileViewModel on ChangeNotifier {
   Future<void> fetchUserBooks();
   Future<void> fetchUserProfile();
   Future<void> updateProfilePhoto(BuildContext context);
+  Future<void> refresh();
 
   void navigateToBookDetails(BuildContext context, Book book) {
     context.push(AppRoutes.bookDetails, extra: book);
@@ -59,7 +61,7 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
     StorageService? storageService,
     ImagePickerService? imagePickerService,
   })  : _getUserProfileUseCase = getUserProfileUseCase ??
-            GetUserProfileUseCase(RatingRepositoryImpl()),
+            GetUserProfileUseCase(UserProfileRepositoryImpl()),
         _getUserRatingsUseCase = getUserRatingsUseCase ??
             GetUserRatingsUseCase(RatingRepositoryImpl()),
         _updateUserProfileUseCase = updateUserProfileUseCase ??
@@ -67,15 +69,21 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
         _storageService = storageService ?? StorageService(),
         _imagePickerService = imagePickerService ?? ImagePickerService() {
     _bookDataManager.addListener(_onBooksDataChanged);
+    UserProfileManager().addListener(_onProfileDataChanged);
   }
 
   void _onBooksDataChanged() {
     notifyListeners();
   }
 
+  void _onProfileDataChanged() {
+    fetchUserProfile();
+  }
+
   @override
   void dispose() {
     _bookDataManager.removeListener(_onBooksDataChanged);
+    UserProfileManager().removeListener(_onProfileDataChanged);
     super.dispose();
   }
 
@@ -157,5 +165,13 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
 
   Future<void> refreshUserProfile() async {
     await fetchUserProfile();
+  }
+
+  @override
+  Future<void> refresh() async {
+    await Future.wait([
+      fetchUserBooks(),
+      fetchUserProfile(),
+    ]);
   }
 }

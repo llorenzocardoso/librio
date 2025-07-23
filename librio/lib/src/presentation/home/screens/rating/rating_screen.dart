@@ -3,6 +3,7 @@ import 'package:librio/src/domain/entities/exchange.dart';
 import 'package:librio/src/presentation/home/screens/rating/rating_viewmodel.dart';
 import 'package:librio/src/data/repositories/rating_repository_impl.dart';
 import 'package:librio/src/domain/usecases/create_rating_usecase.dart';
+import 'package:librio/src/shared/shared.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RatingScreen extends StatefulWidget {
@@ -109,25 +110,20 @@ class _RatingScreenState extends State<RatingScreen> {
                             )
                           : CircleAvatar(
                               radius: 20,
-                              backgroundColor:
-                                  viewModel.evaluatedUserProfile?.photoUrl !=
-                                          null
-                                      ? null
-                                      : Colors.grey,
-                              backgroundImage: viewModel
-                                          .evaluatedUserProfile?.photoUrl !=
-                                      null
-                                  ? NetworkImage(
-                                      viewModel.evaluatedUserProfile!.photoUrl!)
+                              backgroundColor: ImageValidationHelper.shouldShowFallback(
+                                      viewModel.evaluatedUserProfile?.photoUrl)
+                                  ? Colors.grey
                                   : null,
-                              child: viewModel.evaluatedUserProfile?.photoUrl !=
-                                      null
-                                  ? null
-                                  : const Icon(
+                              backgroundImage: ImageValidationHelper.getImageProvider(
+                                  viewModel.evaluatedUserProfile?.photoUrl),
+                              child: ImageValidationHelper.shouldShowFallback(
+                                      viewModel.evaluatedUserProfile?.photoUrl)
+                                  ? const Icon(
                                       Icons.person,
                                       color: Colors.white,
                                       size: 24,
-                                    ),
+                                    )
+                                  : null,
                             ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -180,9 +176,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'Como foi sua experiência?',
               style: TextStyle(
@@ -227,9 +221,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
             const Text(
               'Deixe um comentário (opcional)',
               style: TextStyle(
@@ -254,9 +246,7 @@ class _RatingScreenState extends State<RatingScreen> {
                 contentPadding: const EdgeInsets.all(16),
               ),
             ),
-
             const SizedBox(height: 32),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -282,7 +272,6 @@ class _RatingScreenState extends State<RatingScreen> {
                       ),
               ),
             ),
-
             if (viewModel.error != null) ...[
               const SizedBox(height: 16),
               Container(

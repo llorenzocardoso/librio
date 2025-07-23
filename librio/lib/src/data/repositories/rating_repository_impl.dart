@@ -55,7 +55,8 @@ class RatingRepositoryImpl implements RatingRepository {
   @override
   Future<UserProfile> getUserProfile(String userId) async {
     // Primeiro tentar buscar na coleção user_profiles (nova estrutura)
-    final userProfileDoc = await _firestore.collection('user_profiles').doc(userId).get();
+    final userProfileDoc =
+        await _firestore.collection('user_profiles').doc(userId).get();
 
     if (userProfileDoc.exists) {
       return UserProfileModel.fromFirestore(userProfileDoc);
@@ -87,21 +88,29 @@ class RatingRepositoryImpl implements RatingRepository {
   Future<void> updateUserRatingStats(String userId) async {
     final ratings = await getUserRatings(userId);
 
+    final Map<String, dynamic> updateData;
     if (ratings.isEmpty) {
-      await _firestore.collection('users').doc(userId).update({
+      updateData = {
         'averageRating': 0.0,
         'ratingCount': 0,
-      });
-      return;
+      };
+    } else {
+      final double averageRating =
+          ratings.map((rating) => rating.stars).reduce((a, b) => a + b) /
+              ratings.length;
+      updateData = {
+        'averageRating': averageRating,
+        'ratingCount': ratings.length,
+      };
     }
 
-    final double averageRating =
-        ratings.map((rating) => rating.stars).reduce((a, b) => a + b) /
-            ratings.length;
-
-    await _firestore.collection('users').doc(userId).update({
-      'averageRating': averageRating,
-      'ratingCount': ratings.length,
-    });
+    // Atualizar nas duas coleções para manter consistência
+    await Future.wait([
+      _firestore.collection('users').doc(userId).update(updateData),
+      _firestore.collection('user_profiles').doc(userId).set(
+            updateData,
+            SetOptions(merge: true),
+          ),
+    ]);
   }
 }

@@ -51,6 +51,37 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.isEmpty) return false;
+
+    if (url.startsWith('file://') || !url.startsWith('http')) return false;
+
+    try {
+      Uri.parse(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  ImageProvider? _getProfileImageProvider(
+      ProfileViewModel viewModel, fb.User? user) {
+    if (_isValidImageUrl(viewModel.userProfile?.photoUrl)) {
+      return NetworkImage(viewModel.userProfile!.photoUrl!);
+    }
+
+    if (_isValidImageUrl(user?.photoURL)) {
+      return NetworkImage(user!.photoURL!);
+    }
+
+    return null;
+  }
+
+  bool _hasValidProfileImage(ProfileViewModel viewModel, fb.User? user) {
+    return _isValidImageUrl(viewModel.userProfile?.photoUrl) ||
+        _isValidImageUrl(user?.photoURL);
+  }
+
   @override
   Widget build(BuildContext context) {
     final fb.User? user = fb.FirebaseAuth.instance.currentUser;
@@ -74,270 +105,281 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await viewModel.fetchUserBooks();
+          await viewModel.fetchUserProfile();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: viewModel.userProfile?.photoUrl != null
-                          ? NetworkImage(viewModel.userProfile!.photoUrl!)
-                          : user?.photoURL != null
-                              ? NetworkImage(user!.photoURL!)
-                              : null,
-                      child: (viewModel.userProfile?.photoUrl == null &&
-                              user?.photoURL == null)
-                          ? const Icon(Icons.person, size: 60)
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: viewModel.isUploadingPhoto
-                            ? null
-                            : () => viewModel.updateProfilePhoto(context),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                          padding: const EdgeInsets.all(8),
-                          child: viewModel.isUploadingPhoto
-                              ? const SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.white),
-                                  ),
-                                )
-                              : const Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
-                                  size: 16,
-                                ),
-                        ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage:
+                            _getProfileImageProvider(viewModel, user),
+                        child: !_hasValidProfileImage(viewModel, user)
+                            ? const Icon(Icons.person, size: 60)
+                            : null,
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  user?.displayName ?? user?.email ?? '',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                viewModel.isLoadingProfile
-                    ? const CircularProgressIndicator()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.star, color: Colors.amber, size: 20),
-                          const SizedBox(width: 4),
-                          Text(
-                            viewModel.userProfile?.averageRating
-                                    .toStringAsFixed(1) ??
-                                '0.0',
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '${viewModel.userProfile?.exchangeCount ?? 0} trocas',
-                          ),
-                        ],
-                      ),
-                const SizedBox(height: 16),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Livros disponíveis',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 150,
-                  child: viewModel.isLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : viewModel.error != null
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline,
-                                    size: 48,
-                                    color: Colors.red,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: viewModel.isUploadingPhoto
+                              ? null
+                              : () => viewModel.updateProfilePhoto(context),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            padding: const EdgeInsets.all(8),
+                            child: viewModel.isUploadingPhoto
+                                ? const SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.camera_alt,
+                                    color: Colors.white,
+                                    size: 16,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Erro: ${viewModel.error}',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(color: Colors.red),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  ElevatedButton(
-                                    onPressed: () => viewModel.fetchUserBooks(),
-                                    child: const Text('Tentar novamente'),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : userBooks.isEmpty
-                              ? const Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.book_outlined,
-                                        size: 48,
-                                        color: Colors.grey,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Nenhum livro cadastrado',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'Adicione seus primeiros livros!',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: userBooks.length,
-                                  itemBuilder: (context, index) {
-                                    final book = userBooks[index];
-                                    return Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 8.0),
-                                      child: BookCard(
-                                        book: book,
-                                        onTap: () =>
-                                            viewModel.navigateToBookDetails(
-                                          context,
-                                          book,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                ),
-                const SizedBox(height: 12),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Sobre',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                viewModel.isLoadingProfile
-                    ? const CircularProgressIndicator()
-                    : Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          viewModel.userProfile?.description?.isNotEmpty == true
-                              ? viewModel.userProfile!.description!
-                              : 'Nenhuma descrição adicionada ainda.',
-                          style: const TextStyle(
-                            color: Colors.black54,
                           ),
                         ),
                       ),
-                const SizedBox(height: 12),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Comentários Recebidos',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 6),
-                viewModel.isLoadingProfile
-                    ? const CircularProgressIndicator()
-                    : viewModel.ratingsWithComments.isEmpty
-                        ? const Text(
-                            'Nenhum comentário ainda',
-                            style: TextStyle(color: Colors.black54),
-                          )
-                        : Column(
-                            children: viewModel.ratingsWithComments.take(2).map((rating) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8),
+                  const SizedBox(height: 16),
+                  Text(
+                    user?.displayName ?? user?.email ?? '',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  viewModel.isLoadingProfile
+                      ? const CircularProgressIndicator()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.star,
+                                color: Colors.amber, size: 20),
+                            const SizedBox(width: 4),
+                            Text(
+                              viewModel.userProfile?.averageRating
+                                      .toStringAsFixed(1) ??
+                                  '0.0',
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${viewModel.userProfile?.exchangeCount ?? 0} trocas',
+                            ),
+                          ],
+                        ),
+                  const SizedBox(height: 16),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Livros disponíveis',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 150,
+                    child: viewModel.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : viewModel.error != null
+                            ? Center(
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Row(
+                                    const Icon(
+                                      Icons.error_outline,
+                                      size: 48,
+                                      color: Colors.red,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Erro: ${viewModel.error}',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(color: Colors.red),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    ElevatedButton(
+                                      onPressed: () =>
+                                          viewModel.fetchUserBooks(),
+                                      child: const Text('Tentar novamente'),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : userBooks.isEmpty
+                                ? const Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Row(
-                                          children: List.generate(5, (index) {
-                                            return Icon(
-                                              Icons.star,
-                                              color: index < rating.stars
-                                                  ? Colors.amber
-                                                  : Colors.grey[300],
-                                              size: 16,
-                                            );
-                                          }),
+                                        Icon(
+                                          Icons.book_outlined,
+                                          size: 48,
+                                          color: Colors.grey,
                                         ),
-                                        const SizedBox(width: 8),
+                                        SizedBox(height: 8),
                                         Text(
-                                          DateFormat('dd/MM/yyyy')
-                                              .format(rating.createdAt),
-                                          style: const TextStyle(
-                                            fontSize: 12,
+                                          'Nenhum livro cadastrado',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          'Adicione seus primeiros livros!',
+                                          style: TextStyle(
+                                            fontSize: 14,
                                             color: Colors.grey,
                                           ),
                                         ),
                                       ],
                                     ),
-                                    if (rating.message.isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        rating.message,
-                                        style: const TextStyle(
-                                            color: Colors.black54),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              );
-                            }).toList(),
+                                  )
+                                : ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: userBooks.length,
+                                    itemBuilder: (context, index) {
+                                      final book = userBooks[index];
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 8.0),
+                                        child: BookCard(
+                                          book: book,
+                                          onTap: () =>
+                                              viewModel.navigateToBookDetails(
+                                            context,
+                                            book,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Sobre',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  viewModel.isLoadingProfile
+                      ? const CircularProgressIndicator()
+                      : Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            viewModel.userProfile?.description?.isNotEmpty ==
+                                    true
+                                ? viewModel.userProfile!.description!
+                                : 'Nenhuma descrição adicionada ainda.',
+                            style: const TextStyle(
+                              color: Colors.black54,
+                            ),
                           ),
-                const SizedBox(height: 16),
-              ],
+                        ),
+                  const SizedBox(height: 12),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Comentários Recebidos',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  viewModel.isLoadingProfile
+                      ? const CircularProgressIndicator()
+                      : viewModel.ratingsWithComments.isEmpty
+                          ? const Text(
+                              'Nenhum comentário ainda',
+                              style: TextStyle(color: Colors.black54),
+                            )
+                          : Column(
+                              children: viewModel.ratingsWithComments
+                                  .take(2)
+                                  .map((rating) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Row(
+                                            children: List.generate(5, (index) {
+                                              return Icon(
+                                                Icons.star,
+                                                color: index < rating.stars
+                                                    ? Colors.amber
+                                                    : Colors.grey[300],
+                                                size: 16,
+                                              );
+                                            }),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            DateFormat('dd/MM/yyyy')
+                                                .format(rating.createdAt),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (rating.message.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          rating.message,
+                                          style: const TextStyle(
+                                              color: Colors.black54),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),

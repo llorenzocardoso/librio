@@ -60,7 +60,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Título
               const Text(
                 'Escolha um dos seus livros',
                 style: TextStyle(
@@ -69,7 +68,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // Lista de livros
               Expanded(
                 child: GridView.builder(
                   controller: scrollController,
@@ -108,7 +106,7 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
                                 child: book.imageUrl.isNotEmpty
                                     ? Image.network(
                                         book.imageUrl,
-                                        fit: BoxFit.contain,
+                                        fit: BoxFit.fill,
                                         width: double.infinity,
                                       )
                                     : Container(
@@ -238,7 +236,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título da seção
           const Text(
             'Detalhes da Troca',
             style: TextStyle(
@@ -247,11 +244,8 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-
-          // Exibição dos livros simplificada
           Row(
             children: [
-              // Livro oferecido
               Expanded(
                 child: Column(
                   children: [
@@ -325,8 +319,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
                   ],
                 ),
               ),
-
-              // Seta
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Icon(
@@ -335,8 +327,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
                   color: Colors.grey,
                 ),
               ),
-
-              // Livro desejado
               Expanded(
                 child: Column(
                   children: [
@@ -384,10 +374,7 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
               ),
             ],
           ),
-
           const SizedBox(height: 60),
-
-          // Campo de mensagem
           const Text(
             'Mensagem (opcional):',
             style: TextStyle(
@@ -412,7 +399,6 @@ class _ProposeExchangeScreenState extends State<ProposeExchangeScreen> {
               contentPadding: const EdgeInsets.all(12),
             ),
           ),
-
           const SizedBox(height: 80),
         ],
       ),

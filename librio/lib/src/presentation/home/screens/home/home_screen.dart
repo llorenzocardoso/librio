@@ -107,7 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     onChanged: (query) => viewmodel.searchBooks(query),
                   ),
                 ),
-
                 SliverToBoxAdapter(
                   child: CategoryFilter(
                     categories: categories,
@@ -118,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -226,7 +224,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-
                 if (isLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
@@ -383,11 +380,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLocationRequiredState() {
     return SliverFillRemaining(
-      child: Center(
-        child: Padding(
+      child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height - 200,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 Icons.location_off,

@@ -124,32 +124,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF176FF1),
-                                  shape: BoxShape.circle,
-                                  border:
-                                      Border.all(color: Colors.white, width: 2),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            'Funcionalidade de foto será implementada em breve'),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(
-                                    Icons.camera_alt,
-                                    color: Colors.white,
-                                    size: 20,
+                              child: GestureDetector(
+                                onTap: viewModel.isUploadingPhoto
+                                    ? null
+                                    : () =>
+                                        viewModel.updateProfilePhoto(context),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.white, width: 2),
                                   ),
-                                  constraints: const BoxConstraints(
-                                    minWidth: 36,
-                                    minHeight: 36,
-                                  ),
-                                  padding: EdgeInsets.zero,
+                                  padding: const EdgeInsets.all(8),
+                                  child: viewModel.isUploadingPhoto
+                                      ? const SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
                                 ),
                               ),
                             ),
@@ -167,9 +170,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -188,7 +189,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-
                         const Text(
                           'Nome *',
                           style: TextStyle(
@@ -226,9 +226,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         const Text(
                           'Sobre você',
                           style: TextStyle(
@@ -272,9 +270,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ],
                     ),
                   ),
-
                   const SizedBox(height: 32),
-
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -299,7 +295,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                     ),
                   ),
-
                   const SizedBox(height: 32),
                 ],
               ),

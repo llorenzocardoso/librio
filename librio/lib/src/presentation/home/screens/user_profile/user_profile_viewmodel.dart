@@ -4,6 +4,7 @@ import 'package:librio/src/domain/entities/rating.dart';
 import 'package:librio/src/domain/usecases/get_user_profile_usecase.dart';
 import 'package:librio/src/domain/usecases/get_user_ratings_usecase.dart';
 import 'package:librio/src/data/repositories/rating_repository_impl.dart';
+import 'package:librio/src/data/repositories/user_profile_repository_impl.dart';
 
 class UserProfileViewModel extends ChangeNotifier {
   final GetUserProfileUseCase _getUserProfileUseCase;
@@ -18,7 +19,7 @@ class UserProfileViewModel extends ChangeNotifier {
     GetUserProfileUseCase? getUserProfileUseCase,
     GetUserRatingsUseCase? getUserRatingsUseCase,
   })  : _getUserProfileUseCase = getUserProfileUseCase ??
-            GetUserProfileUseCase(RatingRepositoryImpl()),
+            GetUserProfileUseCase(UserProfileRepositoryImpl()),
         _getUserRatingsUseCase = getUserRatingsUseCase ??
             GetUserRatingsUseCase(RatingRepositoryImpl());
 

@@ -17,7 +17,8 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   @override
   Future<UserProfile> getUserProfile(String userId) async {
     // Primeiro tentar buscar na coleção user_profiles (nova estrutura)
-    final userProfileDoc = await _firestore.collection('user_profiles').doc(userId).get();
+    final userProfileDoc =
+        await _firestore.collection('user_profiles').doc(userId).get();
 
     if (userProfileDoc.exists) {
       return UserProfileModel.fromFirestore(userProfileDoc);
@@ -64,7 +65,15 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
 
     if (updateData.isNotEmpty) {
       updateData['updatedAt'] = FieldValue.serverTimestamp();
-      await _firestore.collection('users').doc(userId).update(updateData);
+
+      // Garantir que o perfil do usuário existe antes de atualizar
+      await _ensureUserProfileExists(userId);
+
+      // Atualizar nas duas coleções para manter consistência
+      await Future.wait([
+        _firestore.collection('users').doc(userId).update(updateData),
+        _firestore.collection('user_profiles').doc(userId).update(updateData),
+      ]);
     }
   }
 
@@ -92,36 +101,61 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
 
     // Usar set com merge: true para criar o documento se não existir
     await _firestore.collection('user_profiles').doc(userId).set(
-      updateData,
-      SetOptions(merge: true),
-    );
+          updateData,
+          SetOptions(merge: true),
+        );
   }
 
   /// Garante que o perfil do usuário existe na coleção user_profiles
   Future<void> _ensureUserProfileExists(String userId) async {
     try {
-      final userProfileDoc = await _firestore.collection('user_profiles').doc(userId).get();
+      final userProfileDoc =
+          await _firestore.collection('user_profiles').doc(userId).get();
 
       if (!userProfileDoc.exists) {
         // Tentar obter dados do usuário da coleção 'users' (compatibilidade)
         final userDoc = await _firestore.collection('users').doc(userId).get();
 
-        final userData = userDoc.exists ? userDoc.data() as Map<String, dynamic> : {};
+        final userData =
+            userDoc.exists ? userDoc.data() as Map<String, dynamic> : {};
+
+        // Tentar obter dados do Firebase Auth se disponível
+        String userName = userData['name'] ?? 'Usuário';
+        String userEmail = userData['email'] ?? '';
+        String userPhotoUrl = userData['photoUrl'] ?? '';
+
+        // Se não há dados locais, tentar do Firebase Auth
+        if (userName == 'Usuário' || userName.isEmpty) {
+          try {
+            final user = _auth.currentUser;
+            if (user != null && user.uid == userId) {
+              userName =
+                  user.displayName ?? user.email?.split('@')[0] ?? 'Usuário';
+              userEmail = user.email ?? userEmail;
+              userPhotoUrl = user.photoURL ?? userPhotoUrl;
+            }
+          } catch (e) {
+            // Ignorar erros do Firebase Auth
+          }
+        }
 
         // Criar perfil básico com dados disponíveis
         final defaultUserData = {
-          'name': userData['name'] ?? 'Usuário',
-          'email': userData['email'] ?? '',
+          'name': userName,
+          'email': userEmail,
           'description': userData['description'] ?? '',
           'averageRating': userData['averageRating'] ?? 0.0,
           'ratingCount': userData['ratingCount'] ?? 0,
           'exchangeCount': userData['exchangeCount'] ?? 0,
-          'photoUrl': userData['photoUrl'] ?? '',
+          'photoUrl': userPhotoUrl,
           'ratings': userData['ratings'] ?? [],
           'createdAt': FieldValue.serverTimestamp(),
         };
 
-        await _firestore.collection('user_profiles').doc(userId).set(defaultUserData);
+        await _firestore
+            .collection('user_profiles')
+            .doc(userId)
+            .set(defaultUserData);
       }
     } catch (e) {
       throw Exception('Erro ao garantir perfil do usuário: $e');

@@ -276,68 +276,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
-              const SizedBox(height: 32),
-              const Center(
-                child: Text(
-                  'Ou continue com',
-                  style: TextStyle(color: Colors.black54, fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _SocialButton(
-                    child: const Text(
-                      'G',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    onPressed: () {},
-                  ),
-                  _SocialButton(
-                    child: const Icon(
-                      Icons.facebook,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                  ),
-                  _SocialButton(
-                    child: const Icon(
-                      Icons.apple,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-  const _SocialButton({required this.child, required this.onPressed, Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-        ),
-        alignment: Alignment.center,
-        child: child,
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/presentation/presentation.dart';
+import 'package:librio/src/shared/shared.dart';
 import 'package:librio/src/domain/usecases/delete_book_usecase.dart';
 import 'package:librio/src/data/repositories/book_repository_impl.dart';
 
@@ -118,7 +119,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ],
               ),
               const SizedBox(height: 8),
-              // Informações do livro
               Row(
                 children: [
                   const Icon(Icons.star, color: Colors.amber, size: 16),
@@ -132,7 +132,6 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              // Owner info
               viewModel.isLoadingOwner
                   ? const Center(
                       child: CircularProgressIndicator(),
@@ -141,24 +140,22 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                       children: [
                         CircleAvatar(
                           radius: 20,
-                          backgroundColor: viewModel.ownerProfile?.photoUrl !=
-                                      null &&
-                                  viewModel.ownerProfile!.photoUrl!.isNotEmpty
-                              ? null
-                              : Colors.grey,
-                          backgroundImage: viewModel.ownerProfile?.photoUrl !=
-                                      null &&
-                                  viewModel.ownerProfile!.photoUrl!.isNotEmpty
-                              ? NetworkImage(viewModel.ownerProfile!.photoUrl!)
-                              : null,
-                          child: viewModel.ownerProfile?.photoUrl != null &&
-                                  viewModel.ownerProfile!.photoUrl!.isNotEmpty
-                              ? null
-                              : const Icon(
+                          backgroundColor:
+                              ImageValidationHelper.shouldShowFallback(
+                                      viewModel.ownerProfile?.photoUrl)
+                                  ? Colors.grey
+                                  : null,
+                          backgroundImage:
+                              ImageValidationHelper.getImageProvider(
+                                  viewModel.ownerProfile?.photoUrl),
+                          child: ImageValidationHelper.shouldShowFallback(
+                                  viewModel.ownerProfile?.photoUrl)
+                              ? const Icon(
                                   Icons.person,
                                   color: Colors.white,
                                   size: 20,
-                                ),
+                                )
+                              : null,
                         ),
                         const SizedBox(width: 8),
                         Column(
@@ -317,8 +314,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                         ),
                       ],
                     )
-                  :
-                  ElevatedButton.icon(
+                  : ElevatedButton.icon(
                       onPressed: () {
                         viewModel.navigateToProposeExchange(context);
                       },
@@ -354,9 +350,9 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
         children: [
           Expanded(
             child: OutlinedButton.icon(
-                             onPressed: () {
-                 context.push('/edit_book', extra: widget.book);
-               },
+              onPressed: () {
+                context.push('/edit_book', extra: widget.book);
+              },
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size.fromHeight(56),
                 side: const BorderSide(color: Color(0xFF176FF1), width: 2),
@@ -429,7 +425,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
 
               try {
                 final deleteUseCase = DeleteBookUseCase(BookRepositoryImpl());
-                                 await deleteUseCase.execute(widget.book.id);
+                await deleteUseCase.execute(widget.book.id);
 
                 if (context.mounted) {
                   context.pop();

@@ -21,7 +21,7 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
         GetUserExchangesUseCase(ExchangeRepositoryImpl());
     _checkRatingExistsUseCase =
         CheckRatingExistsUseCase(RatingRepositoryImpl());
-    _getUserProfileUseCase = GetUserProfileUseCase(RatingRepositoryImpl());
+    _getUserProfileUseCase = GetUserProfileUseCase(UserProfileRepositoryImpl());
   }
 
   // Buscar perfil do usuário (com cache)
@@ -34,6 +34,9 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
     if (user == null) return;
 
     try {
+      // Corrigir nomes de trocas existentes (executar uma vez)
+      await _tryFixExistingExchangeNames();
+
       final userExchanges = await _getUserExchangesUseCase.execute(user.uid);
       exchanges = userExchanges;
 
@@ -52,6 +55,17 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
     }
   }
 
+  /// Tenta corrigir nomes de trocas existentes, ignora erros para não impactar a experiência do usuário
+  Future<void> _tryFixExistingExchangeNames() async {
+    try {
+      final repository = ExchangeRepositoryImpl();
+      await repository.fixExistingExchangeNames();
+    } catch (e) {
+      // Ignorar erros silenciosamente para não impactar a UX
+      print('Aviso: Não foi possível corrigir nomes das trocas: $e');
+    }
+  }
+
   Future<void> _loadUserProfiles() async {
     final userIds = <String>{};
 
@@ -67,7 +81,38 @@ class ExchangeHistoryViewModel extends ChangeNotifier {
         final profile = await _getUserProfileUseCase.execute(userId);
         _userProfiles[userId] = profile;
       } catch (e) {
-        throw Exception('Erro ao buscar perfil do usuário $userId: $e');
+        // Tentar buscar informações básicas do Firebase Auth
+        String userName = 'Usuário';
+        String userEmail = '';
+        String userPhotoUrl = '';
+
+        try {
+          // Se o usuário atual for o mesmo, usar dados do Firebase Auth
+          final currentUser = fb.FirebaseAuth.instance.currentUser;
+          if (currentUser != null && currentUser.uid == userId) {
+            userName = currentUser.displayName ??
+                currentUser.email?.split('@')[0] ??
+                'Usuário';
+            userEmail = currentUser.email ?? '';
+            userPhotoUrl = currentUser.photoURL ?? '';
+          }
+        } catch (authError) {
+          // Ignorar erros do Firebase Auth
+        }
+
+        // Se não conseguir carregar um perfil específico, criar um perfil básico com informações disponíveis
+        _userProfiles[userId] = UserProfile(
+          id: userId,
+          name: userName,
+          email: userEmail,
+          photoUrl: userPhotoUrl,
+          description: '',
+          averageRating: 0.0,
+          ratingCount: 0,
+          exchangeCount: 0,
+          ratings: [],
+        );
+        print('Erro ao buscar perfil do usuário $userId: $e');
       }
     });
 

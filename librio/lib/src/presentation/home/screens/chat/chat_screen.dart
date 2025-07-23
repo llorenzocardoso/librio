@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../domain/entities/message.dart';
+import '../../../../shared/shared.dart';
 import 'chat_viewmodel.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -57,10 +58,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.blue[100],
-                  backgroundImage: _viewModel.otherUserPhotoUrl != null
-                      ? NetworkImage(_viewModel.otherUserPhotoUrl!)
-                      : null,
-                  child: _viewModel.otherUserPhotoUrl == null
+                  backgroundImage: ImageValidationHelper.getImageProvider(
+                      _viewModel.otherUserPhotoUrl),
+                  child: ImageValidationHelper.shouldShowFallback(
+                          _viewModel.otherUserPhotoUrl)
                       ? Text(
                           _viewModel.otherUserName?.isNotEmpty == true
                               ? _viewModel.otherUserName![0].toUpperCase()
@@ -340,8 +341,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.attachment, color: Colors.grey),
-                    onPressed: () {
-                    },
+                    onPressed: () {},
                   ),
                 ],
               ),

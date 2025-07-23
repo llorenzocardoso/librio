@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:librio/src/domain/domain.dart';
 import 'package:librio/src/presentation/presentation.dart';
+import 'package:librio/src/shared/shared.dart';
 import 'package:intl/intl.dart';
 
 class ExchangeHistoryScreen extends StatefulWidget {
@@ -344,18 +345,17 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
       ),
       child: CircleAvatar(
         radius: size / 2,
-        backgroundColor:
-            userProfile?.photoUrl != null ? null : Colors.grey[300],
-        backgroundImage: userProfile?.photoUrl != null
-            ? NetworkImage(userProfile!.photoUrl!)
+        backgroundColor: ImageValidationHelper.shouldShowFallback(userProfile?.photoUrl)
+            ? Colors.grey[300]
             : null,
-        child: userProfile?.photoUrl != null
-            ? null
-            : Icon(
+        backgroundImage: ImageValidationHelper.getImageProvider(userProfile?.photoUrl),
+        child: ImageValidationHelper.shouldShowFallback(userProfile?.photoUrl)
+            ? Icon(
                 Icons.person,
                 size: size * 0.6,
                 color: Colors.grey,
-              ),
+              )
+            : null,
       ),
     );
   }

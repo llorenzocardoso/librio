@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:librio/src/domain/entities/rating.dart';
 import 'package:librio/src/presentation/home/screens/user_profile/user_profile_viewmodel.dart';
+import 'package:librio/src/shared/shared.dart';
 import 'package:intl/intl.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -156,31 +157,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             CircleAvatar(
                               radius: 50,
                               backgroundColor:
-                                  viewModel.userProfile?.photoUrl != null &&
-                                          viewModel
-                                              .userProfile!.photoUrl!.isNotEmpty
-                                      ? null
-                                      : Colors.grey,
-                              backgroundImage:
-                                  viewModel.userProfile?.photoUrl != null &&
-                                          viewModel
-                                              .userProfile!.photoUrl!.isNotEmpty
-                                      ? NetworkImage(
-                                          viewModel.userProfile!.photoUrl!)
+                                  ImageValidationHelper.shouldShowFallback(
+                                          viewModel.userProfile?.photoUrl)
+                                      ? Colors.grey
                                       : null,
-                              child: viewModel.userProfile?.photoUrl != null &&
-                                      viewModel
-                                          .userProfile!.photoUrl!.isNotEmpty
-                                  ? null
-                                  : const Icon(
+                              backgroundImage:
+                                  ImageValidationHelper.getImageProvider(
+                                      viewModel.userProfile?.photoUrl),
+                              child: ImageValidationHelper.shouldShowFallback(
+                                      viewModel.userProfile?.photoUrl)
+                                  ? const Icon(
                                       Icons.person,
                                       color: Colors.white,
                                       size: 50,
-                                    ),
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              viewModel.userProfile?.name ?? 'Usuário',
+                              viewModel.userProfile?.name ?? 'Carregando...',
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -240,9 +235,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 24),
-
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Column(
@@ -302,7 +295,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ],
                         ),
                       ),
-
                       const SizedBox(height: 32),
                     ],
                   ),

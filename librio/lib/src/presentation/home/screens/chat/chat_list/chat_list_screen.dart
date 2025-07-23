@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../domain/entities/chat.dart';
+import '../../../../../shared/shared.dart';
 import 'chat_list_viewmodel.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -158,11 +159,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
             // Avatar
             CircleAvatar(
               radius: 28,
-              backgroundImage: otherParticipant.value['photoUrl'] != null
-                  ? NetworkImage(otherParticipant.value['photoUrl'])
-                  : null,
+              backgroundImage: ImageValidationHelper.getImageProvider(
+                  otherParticipant.value['photoUrl']),
               backgroundColor: Colors.blue[100],
-              child: otherParticipant.value['photoUrl'] == null
+              child: ImageValidationHelper.shouldShowFallback(
+                      otherParticipant.value['photoUrl'])
                   ? Text(
                       otherParticipant.value['name'][0].toUpperCase(),
                       style: const TextStyle(

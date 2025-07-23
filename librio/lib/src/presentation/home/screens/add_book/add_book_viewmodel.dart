@@ -54,13 +54,11 @@ class AddBookViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Obtém a localização do usuário do perfil salvo ou da localização atual
   Future<Map<String, dynamic>?> _getUserLocation() async {
     try {
       final user = fb.FirebaseAuth.instance.currentUser;
       if (user == null) return null;
 
-      // Primeiro, tenta obter do perfil salvo
       final userProfile = await _userProfileRepository.getUserProfile(user.uid);
 
       if (userProfile.latitude != null && userProfile.longitude != null) {
@@ -72,7 +70,6 @@ class AddBookViewModel extends ChangeNotifier {
         };
       }
 
-      // Se não tem localização salva, obtém a localização atual
       final position = await _locationService.getCurrentLocation();
 
       if (position != null) {
@@ -81,7 +78,6 @@ class AddBookViewModel extends ChangeNotifier {
           position.longitude,
         );
 
-        // Salva a localização no perfil do usuário para uso futuro
         await _updateLocationUseCase.execute(
           userId: user.uid,
           latitude: position.latitude,
@@ -101,8 +97,6 @@ class AddBookViewModel extends ChangeNotifier {
 
       return null;
     } catch (e) {
-      // Se não conseguir obter a localização, retorna null
-      print('Erro ao obter localização: $e');
       return null;
     }
   }
@@ -114,7 +108,6 @@ class AddBookViewModel extends ChangeNotifier {
     required String description,
     required String condition,
   }) async {
-    // Verificar se uma imagem foi selecionada (obrigatório)
     if (selectedImageFile == null) {
       error = 'Uma imagem do livro é obrigatória';
       notifyListeners();
@@ -124,7 +117,6 @@ class AddBookViewModel extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     try {
-      // Fazer upload da imagem (obrigatório)
       isUploadingImage = true;
       notifyListeners();
 
@@ -138,15 +130,12 @@ class AddBookViewModel extends ChangeNotifier {
         throw Exception('Falha no upload da imagem');
       }
 
-      // Obter localização do usuário (obrigatório para aparecer na home)
       final locationData = await _getUserLocation();
 
       if (locationData == null) {
-        throw Exception(
-          'Não foi possível obter sua localização. '
-          'Verifique se o GPS está ativado e as permissões foram concedidas. '
-          'A localização é necessária para que outros usuários possam encontrar seus livros.'
-        );
+        throw Exception('Não foi possível obter sua localização. '
+            'Verifique se o GPS está ativado e as permissões foram concedidas. '
+            'A localização é necessária para que outros usuários possam encontrar seus livros.');
       }
 
       await _useCase.execute(

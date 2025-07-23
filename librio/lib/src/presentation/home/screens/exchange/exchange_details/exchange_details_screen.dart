@@ -88,9 +88,7 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ExchangeHeader(exchange: exchange),
-
             const SizedBox(height: 24),
-
             const Text(
               'Livros da troca',
               style: TextStyle(
@@ -99,7 +97,6 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
               ),
             ),
             const SizedBox(height: 16),
-
             Row(
               children: [
                 ExchangeBookCard(
@@ -138,10 +135,8 @@ class _ExchangeDetailsScreenState extends State<ExchangeDetailsScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
             ExchangeMessageSection(exchange: exchange),
-
             const SizedBox(height: 80),
           ],
         ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:librio/src/domain/usecases/create_rating_usecase.dart';
 import 'package:librio/src/domain/usecases/get_user_profile_usecase.dart';
 import 'package:librio/src/domain/entities/user_profile.dart';
-import 'package:librio/src/data/repositories/rating_repository_impl.dart';
+import 'package:librio/src/data/repositories/user_profile_repository_impl.dart';
 
 class RatingViewModel extends ChangeNotifier {
   final CreateRatingUseCase _createRatingUseCase;
@@ -16,7 +16,7 @@ class RatingViewModel extends ChangeNotifier {
   RatingViewModel(this._createRatingUseCase,
       {GetUserProfileUseCase? getUserProfileUseCase})
       : _getUserProfileUseCase = getUserProfileUseCase ??
-            GetUserProfileUseCase(RatingRepositoryImpl());
+            GetUserProfileUseCase(UserProfileRepositoryImpl());
 
   Future<void> loadUserProfile(String userId) async {
     isLoadingUserProfile = true;

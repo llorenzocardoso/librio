@@ -22,18 +22,18 @@ class ChatHelper {
     }
 
     try {
-
       final exchanges = await _getUserExchangesUseCase.execute(currentUserId);
 
-      final specificExchange = exchanges.where((exchange) =>
-          (exchange.proposerId == currentUserId &&
-              exchange.receiverId == otherUserId) ||
-          (exchange.proposerId == otherUserId &&
-              exchange.receiverId == currentUserId)).toList();
+      final specificExchange = exchanges
+          .where((exchange) =>
+              (exchange.proposerId == currentUserId &&
+                  exchange.receiverId == otherUserId) ||
+              (exchange.proposerId == otherUserId &&
+                  exchange.receiverId == currentUserId))
+          .toList();
 
       if (specificExchange.isNotEmpty) {
-        for (var exchange in specificExchange) {
-        }
+        for (var exchange in specificExchange) {}
         return true;
       } else {
         return false;
@@ -48,11 +48,9 @@ class ChatHelper {
     String otherUserId,
     String currentUserId, {
     String? otherUserName,
-    bool forceStart =
-        false,
+    bool forceStart = false,
   }) async {
     try {
-
       if (!forceStart) {
         final canChat = await canChatWith(currentUserId, otherUserId);
         if (!canChat) {
