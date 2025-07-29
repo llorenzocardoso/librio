@@ -1,0 +1,291 @@
+/* Container principal do diagrama Mermaid */
+.mermaid-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Wrapper do diagrama com hover effect */
+.mermaid-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.mermaid-wrapper:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--ifm-color-primary);
+}
+
+/* Botão de tela cheia */
+.fullscreen-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ifm-color-emphasis-700);
+  backdrop-filter: blur(4px);
+}
+
+.fullscreen-button:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  transform: scale(1.05);
+}
+
+/* Dark mode para o botão */
+[data-theme='dark'] .fullscreen-button {
+  background: rgba(40, 44, 52, 0.9);
+  border-color: var(--ifm-color-emphasis-300);
+  color: var(--ifm-color-emphasis-700);
+}
+
+[data-theme='dark'] .fullscreen-button:hover {
+  background: rgba(40, 44, 52, 1);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+}
+
+/* Overlay de tela cheia */
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+/* Dark mode para overlay */
+.fullscreen-overlay.dark {
+  background: rgba(24, 25, 26, 0.95);
+}
+
+/* Controles de tela cheia */
+.fullscreen-controls {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+/* Dark mode para controles */
+.fullscreen-overlay.dark .fullscreen-controls {
+  background: rgba(40, 44, 52, 0.95);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+/* Botões dos controles */
+.fullscreen-controls button {
+  background: transparent;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ifm-color-emphasis-700);
+  min-width: 32px;
+  height: 32px;
+}
+
+.fullscreen-controls button:hover {
+  background: var(--ifm-color-primary-lightest);
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  transform: scale(1.05);
+}
+
+/* Botão de fechar */
+.fullscreen-controls .close-button {
+  background: var(--ifm-color-danger-lightest);
+  color: var(--ifm-color-danger);
+  border-color: var(--ifm-color-danger-light);
+}
+
+.fullscreen-controls .close-button:hover {
+  background: var(--ifm-color-danger-light);
+  color: white;
+  border-color: var(--ifm-color-danger);
+}
+
+/* Indicador de zoom */
+.zoom-level {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-800);
+  min-width: 50px;
+  text-align: center;
+  padding: 0 8px;
+}
+
+/* Conteúdo em tela cheia */
+.fullscreen-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  transition: transform 0.1s ease-out;
+  transform-origin: center center;
+  user-select: none;
+}
+
+/* Melhorias visuais para diagramas Mermaid */
+.mermaid-wrapper .mermaid {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .fullscreen-controls {
+    top: 10px;
+    right: 10px;
+    padding: 6px 8px;
+    gap: 6px;
+  }
+
+  .fullscreen-controls button {
+    padding: 4px;
+    min-width: 28px;
+    height: 28px;
+  }
+
+  .zoom-level {
+    font-size: 12px;
+    min-width: 40px;
+    padding: 0 6px;
+  }
+
+  .fullscreen-content {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fullscreen-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+.fullscreen-controls {
+  animation: fadeIn 0.3s ease 0.1s both;
+}
+
+/* Scroll personalizado para overflow */
+.fullscreen-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.fullscreen-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.fullscreen-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.fullscreen-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Estados de cursor para interação */
+.fullscreen-overlay {
+  cursor: default;
+}
+
+.fullscreen-content[style*="grab"] {
+  cursor: grab !important;
+}
+
+.fullscreen-content[style*="grabbing"] {
+  cursor: grabbing !important;
+}
+
+/* Tooltip personalizado */
+.mermaid-wrapper::before {
+  content: "Clique para visualizar em tela cheia";
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.mermaid-wrapper:hover::before {
+  opacity: 1;
+}
+
+/* Focus states para acessibilidade */
+.fullscreen-button:focus,
+.fullscreen-controls button:focus {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+/* Dark mode melhorado */
+[data-theme='dark'] .zoom-level {
+  color: var(--ifm-color-emphasis-600);
+}
+
+[data-theme='dark'] .fullscreen-controls button {
+  color: var(--ifm-color-emphasis-600);
+  border-color: var(--ifm-color-emphasis-400);
+}
+
+[data-theme='dark'] .fullscreen-controls button:hover {
+  background: var(--ifm-color-primary-dark);
+  color: var(--ifm-color-primary-lightest);
+}

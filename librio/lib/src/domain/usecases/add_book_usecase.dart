@@ -11,6 +11,11 @@ class AddBookUseCase {
     required String genre,
     required String description,
     required String condition,
+    required String? imageUrl,
+    double? latitude,
+    double? longitude,
+    String? city,
+    String? state,
   }) {
     return repository.addBook(
       title: title,
@@ -18,6 +23,11 @@ class AddBookUseCase {
       genre: genre,
       description: description,
       condition: condition,
+      imageUrl: imageUrl,
+      latitude: latitude,
+      longitude: longitude,
+      city: city,
+      state: state,
     );
   }
 }

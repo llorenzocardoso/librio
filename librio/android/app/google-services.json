@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "180000134955",
-    "project_id": "librio-bf422",
-    "storage_bucket": "librio-bf422.firebasestorage.app"
+    "project_number": "398106514550",
+    "project_id": "librio-12fd4",
+    "storage_bucket": "librio-12fd4.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:180000134955:android:1857aad21d2eb86e7ed76e",
+        "mobilesdk_app_id": "1:398106514550:android:359b85e2a113b31a923b57",
         "android_client_info": {
           "package_name": "com.lorenzocardoso.librio"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyClnuvyXaxLKjJ2JUmsgr5zN9gkTfIAnVQ"
+          "current_key": "AIzaSyDnY5PZ1CIRIRxEJHNY1iVvllpBQlWbjdg"
         }
       ],
       "services": {

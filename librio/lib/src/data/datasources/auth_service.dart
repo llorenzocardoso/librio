@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
+import 'package:librio/src/shared/shared.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -8,25 +9,24 @@ class AuthService {
 
   Future<UserCredential?> signInWithEmailAndPassword(
       String email, String password) async {
-    try {
-      return await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-    } catch (e) {
-      throw Exception(e);
-    }
+    return await _firebaseAuth.signInWithEmailAndPassword(
+        email: email, password: password);
   }
 
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
+    BookDataManager().clear();
   }
 
   Future<fb.UserCredential> signUpWithEmailAndPassword(
       String email, String password) async {
-    try {
-      return await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-    } catch (e) {
-      throw Exception(e);
-    }
+    return await _firebaseAuth.createUserWithEmailAndPassword(
+        email: email, password: password);
+  }
+
+  Future<void> sendPasswordResetEmail({
+    required String email,
+  }) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 }

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:librio/src/data/datasources/auth_service.dart';
-import 'package:librio/src/data/repositories/user_repository_impl.dart';
-import 'package:librio/src/domain/usecases/sign_up_usecase.dart';
-import 'package:librio/src/presentation/auth/screens/signup/sign_up_viewmodel.dart';
+import 'package:librio/src/data/data.dart';
+import 'package:librio/src/domain/domain.dart';
+import 'package:librio/src/presentation/presentation.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -19,13 +18,15 @@ class SignUpScreenState extends State<SignUpScreen> {
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
 
-  // Focus nodes to track which field is selected
   late FocusNode _emailFocusNode;
   late FocusNode _passwordFocusNode;
   late FocusNode _confirmPasswordFocusNode;
   late FocusNode _nameFocusNode;
 
   late SignUpViewModel viewModel;
+
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void initState() {
@@ -104,8 +105,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
                         ),
                       ),
                       validator: (value) {
@@ -115,7 +117,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                         return null;
                       },
                     ),
-
+                    const SizedBox(height: 24),
                     // Email
                     TextFormField(
                       focusNode: _emailFocusNode,
@@ -130,8 +132,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.emailAddress,
@@ -158,11 +161,25 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                         ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscurePassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, insira sua senha';
@@ -174,7 +191,6 @@ class SignUpScreenState extends State<SignUpScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    // Confirm password
                     TextFormField(
                       focusNode: _confirmPasswordFocusNode,
                       controller: _confirmPasswordController,
@@ -188,11 +204,26 @@ class SignUpScreenState extends State<SignUpScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
-                          borderSide:
-                              const BorderSide(color: Color(0xFF1D4ED8)),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1D4ED8),
+                          ),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[600],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
+                            });
+                          },
                         ),
                       ),
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor, confirme sua senha';
@@ -245,63 +276,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                   style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               ),
-              const SizedBox(height: 32),
-              const Center(
-                child: Text(
-                  'Ou continue com',
-                  style: TextStyle(color: Colors.black54, fontSize: 16),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _SocialButton(
-                    child: const Text('G', style: TextStyle(fontSize: 24)),
-                    onPressed: () {},
-                  ),
-                  _SocialButton(
-                    child: const Icon(Icons.facebook, size: 24),
-                    onPressed: () {},
-                  ),
-                  _SocialButton(
-                    child: const Icon(
-                      Icons.apple,
-                      size: 24,
-                    ),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Social Button widget
-class _SocialButton extends StatelessWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-  const _SocialButton({required this.child, required this.onPressed, Key? key})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-        ),
-        alignment: Alignment.center,
-        child: child,
       ),
     );
   }
