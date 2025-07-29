@@ -28,7 +28,7 @@ class BookCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: book.imageUrl.isNotEmpty
               ? Image.network(
