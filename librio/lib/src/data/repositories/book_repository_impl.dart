@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:librio/src/domain/repositories/book_repository.dart';
 import 'package:librio/src/domain/entities/book.dart';
 import 'package:librio/src/shared/shared.dart';
-import 'package:librio/src/data/datasources/storage_service.dart';
+import 'package:librio/src/data/datasources/cloudinary_storage_service.dart';
 
 class BookRepositoryImpl implements BookRepository {
   final FirebaseFirestore _firestore;
@@ -34,24 +34,24 @@ class BookRepositoryImpl implements BookRepository {
     }
 
     try {
-    await _firestore.collection('books').add({
-      'title': title,
-      'author': author,
-      'genre': genre,
-      'description': description,
-      'condition': condition,
+      await _firestore.collection('books').add({
+        'title': title,
+        'author': author,
+        'genre': genre,
+        'description': description,
+        'condition': condition,
         'imageUrl': imageUrl,
         'ownerId': currentUser.uid,
-      'available': true,
+        'available': true,
         'latitude': latitude,
         'longitude': longitude,
         'city': city,
         'state': state,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-    // Notificar BookDataManager sobre novo livro adicionado
-    await BookDataManager().notifyBookDataChanged();
+      // Notificar BookDataManager sobre novo livro adicionado
+      await BookDataManager().notifyBookDataChanged();
     } catch (e) {
       throw Exception('Erro ao adicionar livro: $e');
     }
@@ -339,24 +339,24 @@ class BookRepositoryImpl implements BookRepository {
       final exchangesQuery = await _firestore
           .collection('exchanges')
           .where('proposerBookId', isEqualTo: bookId)
-          .where('status', whereIn: ['pending', 'accepted'])
-          .get();
+          .where('status', whereIn: ['pending', 'accepted']).get();
 
       final receiverExchangesQuery = await _firestore
           .collection('exchanges')
           .where('receiverBookId', isEqualTo: bookId)
-          .where('status', whereIn: ['pending', 'accepted'])
-          .get();
+          .where('status', whereIn: ['pending', 'accepted']).get();
 
-      if (exchangesQuery.docs.isNotEmpty || receiverExchangesQuery.docs.isNotEmpty) {
-        throw Exception('Não é possível excluir um livro que está em uma troca ativa');
+      if (exchangesQuery.docs.isNotEmpty ||
+          receiverExchangesQuery.docs.isNotEmpty) {
+        throw Exception(
+            'Não é possível excluir um livro que está em uma troca ativa');
       }
 
       // Deletar a imagem do storage se existir
       final imageUrl = bookData['imageUrl'] as String?;
       if (imageUrl != null && imageUrl.isNotEmpty) {
         try {
-          final storageService = StorageService();
+          final storageService = CloudinaryStorageService();
           await storageService.deleteBookImage(imageUrl);
         } catch (e) {
           throw Exception('Erro ao deletar imagem do livro: $e');

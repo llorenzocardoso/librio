@@ -123,7 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
                               'Livros Disponíveis para Troca',
@@ -133,20 +134,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             if (viewmodel.locationEnabled) ...[
-                              const SizedBox(width: 8),
-                              const Icon(
-                                Icons.location_on,
-                                size: 20,
-                                color: Colors.green,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Próximos a você',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.green.shade700,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_on,
+                                    size: 16,
+                                    color: Colors.green,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Próximos a você',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.green.shade700,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ],
@@ -160,6 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontSize: 12,
                               color: Colors.grey[600],
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                         if (viewmodel.selectedCategory != 'Todos' ||
@@ -210,6 +217,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.grey[600],
                               fontStyle: FontStyle.italic,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           )
                         else if (viewmodel.selectedCategory != 'Todos')
                           Text(
@@ -219,6 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: Colors.grey[600],
                               fontStyle: FontStyle.italic,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                       ],
                     ),
@@ -381,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildLocationRequiredState() {
     return SliverFillRemaining(
       child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(24.0),
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: MediaQuery.of(context).size.height - 200,

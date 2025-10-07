@@ -18,8 +18,8 @@ service firebase.storage {
 
     // Regras para imagens de livros
     match /book_images/{imageId} {
-      // Permitir leitura para usuários autenticados
-      allow read: if request.auth != null;
+      // Permitir leitura pública para que todos possam ver as capas dos livros
+      allow read: if true;
 
       // Permitir upload apenas do próprio usuário
       // O nome do arquivo deve conter o UID do usuário

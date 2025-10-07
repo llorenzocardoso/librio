@@ -49,7 +49,7 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
   final GetUserProfileUseCase _getUserProfileUseCase;
   final GetUserRatingsUseCase _getUserRatingsUseCase;
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
-  final StorageService _storageService;
+  final CloudinaryStorageService _storageService;
   final ImagePickerService _imagePickerService;
   final fb.FirebaseAuth _auth = fb.FirebaseAuth.instance;
 
@@ -58,7 +58,7 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
     GetUserProfileUseCase? getUserProfileUseCase,
     GetUserRatingsUseCase? getUserRatingsUseCase,
     UpdateUserProfileUseCase? updateUserProfileUseCase,
-    StorageService? storageService,
+    CloudinaryStorageService? storageService,
     ImagePickerService? imagePickerService,
   })  : _getUserProfileUseCase = getUserProfileUseCase ??
             GetUserProfileUseCase(UserProfileRepositoryImpl()),
@@ -66,7 +66,7 @@ class ProfileViewModelImpl extends ChangeNotifier with ProfileViewModel {
             GetUserRatingsUseCase(RatingRepositoryImpl()),
         _updateUserProfileUseCase = updateUserProfileUseCase ??
             UpdateUserProfileUseCase(UserProfileRepositoryImpl()),
-        _storageService = storageService ?? StorageService(),
+        _storageService = storageService ?? CloudinaryStorageService(),
         _imagePickerService = imagePickerService ?? ImagePickerService() {
     _bookDataManager.addListener(_onBooksDataChanged);
     UserProfileManager().addListener(_onProfileDataChanged);

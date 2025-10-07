@@ -11,7 +11,7 @@ import 'package:librio/src/shared/shared.dart';
 class EditProfileViewModel extends ChangeNotifier {
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
   final UserProfileRepositoryImpl _userProfileRepository;
-  final StorageService _storageService;
+  final CloudinaryStorageService _storageService;
   final ImagePickerService _imagePickerService;
 
   UserProfile? _userProfile;
@@ -23,13 +23,13 @@ class EditProfileViewModel extends ChangeNotifier {
   EditProfileViewModel({
     UpdateUserProfileUseCase? updateUserProfileUseCase,
     UserProfileRepositoryImpl? userProfileRepository,
-    StorageService? storageService,
+    CloudinaryStorageService? storageService,
     ImagePickerService? imagePickerService,
   })  : _updateUserProfileUseCase = updateUserProfileUseCase ??
             UpdateUserProfileUseCase(UserProfileRepositoryImpl()),
         _userProfileRepository =
             userProfileRepository ?? UserProfileRepositoryImpl(),
-        _storageService = storageService ?? StorageService(),
+        _storageService = storageService ?? CloudinaryStorageService(),
         _imagePickerService = imagePickerService ?? ImagePickerService() {
     UserProfileManager().addListener(_onProfileDataChanged);
   }

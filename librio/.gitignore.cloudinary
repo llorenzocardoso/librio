@@ -1,0 +1,9 @@
+# ============================================
+# CLOUDINARY - Adicione ao seu .gitignore
+# ============================================
+
+# Arquivo de configuração com credenciais do Cloudinary
+lib/src/config/cloudinary_config.dart
+
+# Mantenha apenas o arquivo de exemplo:
+# lib/src/config/cloudinary_config.dart.example

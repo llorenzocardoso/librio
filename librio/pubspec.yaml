@@ -41,6 +41,9 @@ dependencies:
   firebase_auth: ^4.17.8
   firebase_storage: ^11.6.9
 
+  # Image Storage - Cloudinary
+  cloudinary_public: ^0.21.0
+
   # Image Picker
   image_picker: ^1.0.7
   path: ^1.8.3

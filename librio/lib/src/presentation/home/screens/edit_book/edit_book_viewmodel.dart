@@ -10,7 +10,7 @@ import 'package:librio/src/data/datasources/location_service.dart';
 class EditBookViewModel extends ChangeNotifier {
   final UpdateBookUseCase _updateBookUseCase;
   final DeleteBookUseCase _deleteBookUseCase;
-  final StorageService _storageService;
+  final CloudinaryStorageService _storageService;
   final ImagePickerService _imagePickerService;
   final LocationService _locationService;
 
@@ -30,14 +30,14 @@ class EditBookViewModel extends ChangeNotifier {
   EditBookViewModel({
     UpdateBookUseCase? updateBookUseCase,
     DeleteBookUseCase? deleteBookUseCase,
-    StorageService? storageService,
+    CloudinaryStorageService? storageService,
     ImagePickerService? imagePickerService,
     LocationService? locationService,
   })  : _updateBookUseCase =
             updateBookUseCase ?? UpdateBookUseCase(BookRepositoryImpl()),
         _deleteBookUseCase =
             deleteBookUseCase ?? DeleteBookUseCase(BookRepositoryImpl()),
-        _storageService = storageService ?? StorageService(),
+        _storageService = storageService ?? CloudinaryStorageService(),
         _imagePickerService = imagePickerService ?? ImagePickerService(),
         _locationService = locationService ?? LocationService();
 
