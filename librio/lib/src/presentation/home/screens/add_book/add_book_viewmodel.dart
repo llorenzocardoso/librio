@@ -11,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart' as fb;
 
 class AddBookViewModel extends ChangeNotifier {
   final AddBookUseCase _useCase;
-  final CloudinaryStorageService _storageService;
+  final StorageService _storageService;
   final ImagePickerService _imagePickerService;
   final LocationService _locationService;
   final UserProfileRepository _userProfileRepository;
@@ -24,11 +24,11 @@ class AddBookViewModel extends ChangeNotifier {
 
   AddBookViewModel(
     this._useCase, {
-    CloudinaryStorageService? storageService,
+    StorageService? storageService,
     ImagePickerService? imagePickerService,
     LocationService? locationService,
     UserProfileRepository? userProfileRepository,
-  })  : _storageService = storageService ?? CloudinaryStorageService(),
+  })  : _storageService = storageService ?? StorageService(),
         _imagePickerService = imagePickerService ?? ImagePickerService(),
         _locationService = locationService ?? LocationService(),
         _userProfileRepository =

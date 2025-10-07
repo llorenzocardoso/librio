@@ -6,7 +6,6 @@ import 'package:librio/src/presentation/presentation.dart';
 import 'package:librio/src/shared/shared.dart';
 import 'package:librio/src/domain/usecases/delete_book_usecase.dart';
 import 'package:librio/src/data/repositories/book_repository_impl.dart';
-import 'package:librio/src/presentation/home/widgets/fullscreen_image_viewer.dart';
 
 class BookDetailsScreen extends StatefulWidget {
   final Book book;
@@ -77,60 +76,17 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
-                child: GestureDetector(
-                  onTap: () {
-                    if (book.imageUrl.isNotEmpty) {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => FullscreenImageViewer(
-                            imageUrl: book.imageUrl,
-                            heroTag: 'book_image_${book.id}',
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 260,
+                    child: book.imageUrl.isNotEmpty
+                        ? Image.network(book.imageUrl, fit: BoxFit.cover)
+                        : Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.book, size: 50),
                           ),
-                        ),
-                      );
-                    }
-                  },
-                  child: Hero(
-                    tag: 'book_image_${book.id}',
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 260,
-                        child: book.imageUrl.isNotEmpty
-                            ? Stack(
-                                children: [
-                                  Image.network(
-                                    book.imageUrl,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 260,
-                                  ),
-                                  // Indicador visual de que a imagem é clicável
-                                  Positioned(
-                                    bottom: 8,
-                                    right: 8,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.black.withOpacity(0.5),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.zoom_in,
-                                        color: Colors.white,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            : Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.book, size: 50),
-                              ),
-                      ),
-                    ),
                   ),
                 ),
               ),

@@ -12,8 +12,6 @@
 .swiftpm/
 migrate_working_dir/
 
-lib/src/config/cloudinary_config.dart
-
 # IntelliJ related
 *.iml
 *.ipr
